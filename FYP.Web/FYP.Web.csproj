@@ -21,4 +21,13 @@
     <ProjectReference Include="..\FYP.Services\FYP.Services.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Controllers\Inventory\" />
+    <Folder Include="Controllers\Finance\" />
+    <Folder Include="Controllers\Products\" />
+    <Folder Include="Controllers\Purchase\" />
+    <Folder Include="Controllers\Sales\" />
+    <Folder Include="Controllers\Partners\" />
+  </ItemGroup>
+
 </Project>

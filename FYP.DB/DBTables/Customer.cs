@@ -9,31 +9,26 @@ namespace FYP.DB.DBTables;
 public partial class Customer
 {
     [Key]
-    [Column("customer_id")]
-    public int CustomerId { get; set; }
+    public int customer_id { get; set; }
 
-    [Column("customer_name")]
     [StringLength(50)]
     [Unicode(false)]
-    public string? CustomerName { get; set; }
+    public string? customer_name { get; set; }
 
-    [Column("email")]
     [StringLength(100)]
     [Unicode(false)]
-    public string? Email { get; set; }
+    public string? email { get; set; }
 
-    [Column("phone")]
-    public long? Phone { get; set; }
+    public long? phone { get; set; }
 
-    [Column("address", TypeName = "text")]
-    public string? Address { get; set; }
+    [Column(TypeName = "text")]
+    public string? address { get; set; }
 
-    [Column("record")]
-    public double? Record { get; set; }
+    public double? record { get; set; }
 
-    [InverseProperty("Customer")]
+    [InverseProperty("customer")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    [InverseProperty("Customer")]
-    public virtual ICollection<SaleOrder> SaleOrders { get; set; } = new List<SaleOrder>();
+    [InverseProperty("customer")]
+    public virtual ICollection<Sale_Order> Sale_Orders { get; set; } = new List<Sale_Order>();
 }

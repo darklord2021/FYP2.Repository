@@ -9,37 +9,32 @@ namespace FYP.DB.DBTables;
 public partial class Transfer
 {
     [Key]
-    [Column("ID")]
-    public int Id { get; set; }
+    public int ID { get; set; }
 
-    [Column("Doc_name")]
     [StringLength(50)]
     [Unicode(false)]
-    public string? DocName { get; set; }
+    public string? Doc_name { get; set; }
 
-    [Column("Source_Document")]
     [StringLength(50)]
     [Unicode(false)]
-    public string? SourceDocument { get; set; }
+    public string? Source_Document { get; set; }
 
-    [Column("created_date", TypeName = "date")]
-    public DateTime? CreatedDate { get; set; }
+    [Column(TypeName = "date")]
+    public DateTime? created_date { get; set; }
 
-    [Column("backorder_doc_id")]
-    public int? BackorderDocId { get; set; }
+    public int? backorder_doc_id { get; set; }
 
-    [Column("status")]
     [StringLength(50)]
     [Unicode(false)]
-    public string Status { get; set; } = null!;
+    public string status { get; set; } = null!;
 
-    [ForeignKey("BackorderDocId")]
-    [InverseProperty("InverseBackorderDoc")]
-    public virtual Transfer? BackorderDoc { get; set; }
+    [InverseProperty("backorder_doc")]
+    public virtual ICollection<Transfer> Inversebackorder_doc { get; set; } = new List<Transfer>();
 
-    [InverseProperty("BackorderDoc")]
-    public virtual ICollection<Transfer> InverseBackorderDoc { get; set; } = new List<Transfer>();
+    [InverseProperty("transfer")]
+    public virtual ICollection<Transfer_Detail> Transfer_Details { get; set; } = new List<Transfer_Detail>();
 
-    [InverseProperty("Transfer")]
-    public virtual ICollection<TransferDetail> TransferDetails { get; set; } = new List<TransferDetail>();
+    [ForeignKey("backorder_doc_id")]
+    [InverseProperty("Inversebackorder_doc")]
+    public virtual Transfer? backorder_doc { get; set; }
 }

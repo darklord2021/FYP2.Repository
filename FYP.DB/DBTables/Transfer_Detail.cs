@@ -6,25 +6,24 @@ using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
-public partial class Review
+public partial class Transfer_Detail
 {
     [Key]
     public int id { get; set; }
 
-    public byte? stars { get; set; }
-
-    [Column(TypeName = "text")]
-    public string Description { get; set; } = null!;
-
-    public int? customer_id { get; set; }
+    public int? transfer_id { get; set; }
 
     public int? product_id { get; set; }
 
-    [ForeignKey("customer_id")]
-    [InverseProperty("Reviews")]
-    public virtual Customer? customer { get; set; }
+    public int? demand { get; set; }
+
+    public int? done { get; set; }
 
     [ForeignKey("product_id")]
-    [InverseProperty("Reviews")]
+    [InverseProperty("Transfer_Details")]
     public virtual Product? product { get; set; }
+
+    [ForeignKey("transfer_id")]
+    [InverseProperty("Transfer_Details")]
+    public virtual Transfer? transfer { get; set; }
 }

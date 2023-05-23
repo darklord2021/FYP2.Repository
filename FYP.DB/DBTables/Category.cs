@@ -10,23 +10,21 @@ namespace FYP.DB.DBTables;
 public partial class Category
 {
     [Key]
-    [Column("category_id")]
-    public int CategoryId { get; set; }
+    public int category_id { get; set; }
 
-    [Column("category_name")]
     [StringLength(50)]
     [Unicode(false)]
-    public string CategoryName { get; set; } = null!;
+    public string category_name { get; set; } = null!;
 
     [Column(TypeName = "text")]
     public string? Description { get; set; }
 
-    [Column("created_on", TypeName = "date")]
-    public DateTime? CreatedOn { get; set; }
+    [Column(TypeName = "date")]
+    public DateTime? created_on { get; set; }
 
-    [Column("last_modified", TypeName = "date")]
-    public DateTime? LastModified { get; set; }
+    [Column(TypeName = "date")]
+    public DateTime? last_modified { get; set; }
 
-    [InverseProperty("Category")]
+    [InverseProperty("category")]
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

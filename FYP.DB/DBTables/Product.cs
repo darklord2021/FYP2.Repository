@@ -10,45 +10,39 @@ namespace FYP.DB.DBTables;
 public partial class Product
 {
     [Key]
-    [Column("product_id")]
-    public int ProductId { get; set; }
+    public int product_id { get; set; }
 
-    [Column("name")]
     [StringLength(50)]
     [Unicode(false)]
-    public string Name { get; set; } = null!;
+    public string name { get; set; } = null!;
 
-    [Column("description", TypeName = "text")]
-    public string? Description { get; set; }
+    [Column(TypeName = "text")]
+    public string? description { get; set; }
 
-    [Column("quantity")]
-    public int? Quantity { get; set; }
+    public int? quantity { get; set; }
 
-    [Column("unit_price", TypeName = "money")]
-    public decimal? UnitPrice { get; set; }
+    [Column(TypeName = "money")]
+    public decimal? unit_price { get; set; }
 
-    [Column("category_id")]
-    public int CategoryId { get; set; }
+    public int category_id { get; set; }
 
-    [Column("reorder_level")]
-    public int? ReorderLevel { get; set; }
+    public int? reorder_level { get; set; }
 
-    [Column("discontinued")]
-    public bool Discontinued { get; set; }
+    public bool discontinued { get; set; }
 
-    [ForeignKey("CategoryId")]
-    [InverseProperty("Products")]
-    public virtual Category Category { get; set; } = null!;
+    [InverseProperty("product")]
+    public virtual ICollection<Purchase_Order_Detail> Purchase_Order_Details { get; set; } = new List<Purchase_Order_Detail>();
 
-    [InverseProperty("Product")]
-    public virtual ICollection<PurchaseOrderDetail> PurchaseOrderDetails { get; set; } = new List<PurchaseOrderDetail>();
-
-    [InverseProperty("Product")]
+    [InverseProperty("product")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
-    [InverseProperty("Product")]
-    public virtual ICollection<SaleOrderDetail> SaleOrderDetails { get; set; } = new List<SaleOrderDetail>();
+    [InverseProperty("product")]
+    public virtual ICollection<Sale_Order_Detail> Sale_Order_Details { get; set; } = new List<Sale_Order_Detail>();
 
-    [InverseProperty("Product")]
-    public virtual ICollection<TransferDetail> TransferDetails { get; set; } = new List<TransferDetail>();
+    [InverseProperty("product")]
+    public virtual ICollection<Transfer_Detail> Transfer_Details { get; set; } = new List<Transfer_Detail>();
+
+    [ForeignKey("category_id")]
+    [InverseProperty("Products")]
+    public virtual Category category { get; set; } = null!;
 }

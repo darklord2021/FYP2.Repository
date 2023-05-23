@@ -10,17 +10,15 @@ namespace FYP.DB.DBTables;
 public partial class Payment
 {
     [Key]
-    [Column("id")]
-    public int Id { get; set; }
+    public int id { get; set; }
 
-    [Column("method_name")]
     [StringLength(50)]
     [Unicode(false)]
-    public string MethodName { get; set; } = null!;
+    public string method_name { get; set; } = null!;
 
-    [InverseProperty("PaymentMethodNavigation")]
-    public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
+    [InverseProperty("payment_methodNavigation")]
+    public virtual ICollection<Purchase_Order> Purchase_Orders { get; set; } = new List<Purchase_Order>();
 
-    [InverseProperty("PaymentMethodNavigation")]
-    public virtual ICollection<SaleOrder> SaleOrders { get; set; } = new List<SaleOrder>();
+    [InverseProperty("payment_methodNavigation")]
+    public virtual ICollection<Sale_Order> Sale_Orders { get; set; } = new List<Sale_Order>();
 }

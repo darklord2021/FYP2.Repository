@@ -9,33 +9,27 @@ namespace FYP.DB.DBTables;
 public partial class Vendor
 {
     [Key]
-    [Column("vendor_id")]
-    public int VendorId { get; set; }
+    public int vendor_id { get; set; }
 
-    [Column("name")]
     [StringLength(100)]
     [Unicode(false)]
-    public string Name { get; set; } = null!;
+    public string name { get; set; } = null!;
 
-    [Column("NTN")]
-    public long? Ntn { get; set; }
+    public long? NTN { get; set; }
 
-    [Column("phone_number")]
-    public long? PhoneNumber { get; set; }
+    public long? phone_number { get; set; }
 
-    [Column("email_address")]
     [StringLength(100)]
     [Unicode(false)]
-    public string? EmailAddress { get; set; }
+    public string? email_address { get; set; }
 
-    [Column("vendor_address", TypeName = "text")]
-    public string? VendorAddress { get; set; }
+    [Column(TypeName = "text")]
+    public string? vendor_address { get; set; }
 
-    [Column("website")]
     [StringLength(150)]
     [Unicode(false)]
-    public string? Website { get; set; }
+    public string? website { get; set; }
 
-    [InverseProperty("Vendor")]
-    public virtual ICollection<PurchaseOrder> PurchaseOrders { get; set; } = new List<PurchaseOrder>();
+    [InverseProperty("vendor")]
+    public virtual ICollection<Purchase_Order> Purchase_Orders { get; set; } = new List<Purchase_Order>();
 }
