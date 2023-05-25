@@ -1,0 +1,59 @@
+﻿@model FYP.DB.DBTables.Sale_Order
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Sale_Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="sale_id" />
+            <div class="form-group">
+                <label asp-for="customer_id" class="control-label"></label>
+                <select asp-for="customer_id" class="form-control" asp-items="ViewBag.customer_id"></select>
+                <span asp-validation-for="customer_id" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="name" class="control-label"></label>
+                <input asp-for="name" class="form-control" />
+                <span asp-validation-for="name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="total_amount" class="control-label"></label>
+                <input asp-for="total_amount" class="form-control" />
+                <span asp-validation-for="total_amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="payment_method" class="control-label"></label>
+                <select asp-for="payment_method" class="form-control" asp-items="ViewBag.payment_method"></select>
+                <span asp-validation-for="payment_method" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="date_created" class="control-label"></label>
+                <input asp-for="date_created" class="form-control" />
+                <span asp-validation-for="date_created" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="state" class="control-label"></label>
+                <input asp-for="state" class="form-control" />
+                <span asp-validation-for="state" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

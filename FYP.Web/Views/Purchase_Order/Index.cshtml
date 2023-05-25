@@ -1,0 +1,65 @@
+﻿@model IEnumerable<FYP.DB.DBTables.Purchase_Order>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.doc_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.cost)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.create_date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.state)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.payment_methodNavigation)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.vendor)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.doc_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.cost)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.create_date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.state)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.payment_methodNavigation.method_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.vendor.name)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.purchase_id">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.purchase_id">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.purchase_id">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

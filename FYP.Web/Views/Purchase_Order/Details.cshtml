@@ -1,0 +1,54 @@
+﻿@model FYP.DB.DBTables.Purchase_Order
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details</h1>
+
+<div>
+    <h4>Purchase_Order</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.doc_name)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.doc_name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.cost)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.cost)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.create_date)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.create_date)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.state)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.state)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.payment_methodNavigation)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.payment_methodNavigation.method_name)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.vendor)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.vendor.name)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.purchase_id">Edit</a> |
+    <a asp-action="Index">Back to List</a>
+</div>

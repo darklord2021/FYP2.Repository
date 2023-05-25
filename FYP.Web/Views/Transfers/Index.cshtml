@@ -1,0 +1,59 @@
+﻿@model IEnumerable<FYP.DB.DBTables.Transfer>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Index</h1>
+
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Doc_name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Source_Document)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.created_date)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.status)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.backorder_doc)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+@foreach (var item in Model) {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Doc_name)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Source_Document)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.created_date)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.status)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.backorder_doc.status)
+            </td>
+            <td>
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
+                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+            </td>
+        </tr>
+}
+    </tbody>
+</table>

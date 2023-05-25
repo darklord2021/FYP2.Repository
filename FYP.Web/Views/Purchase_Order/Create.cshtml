@@ -1,0 +1,46 @@
+﻿@model FYP.DB.DBTables.Purchase_Order
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Purchase_Order</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="vendor_id" class="control-label"></label>
+                <select asp-for="vendor_id" class ="form-control" asp-items="ViewBag.vendor_id"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="doc_name" class="control-label"></label>
+                <input asp-for="doc_name" class="form-control" />
+                <span asp-validation-for="doc_name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="create_date" class="control-label"></label>
+                <input asp-for="create_date" class="form-control" />
+                <span asp-validation-for="create_date" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="payment_method" class="control-label"></label>
+                <select asp-for="payment_method" class ="form-control" asp-items="ViewBag.payment_method"></select>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
