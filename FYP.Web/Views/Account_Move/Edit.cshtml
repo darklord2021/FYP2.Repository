@@ -1,0 +1,74 @@
+﻿@model FYP.DB.DBTables.Account_Move
+
+@{
+    ViewData["Title"] = "Edit";
+}
+
+<h1>Edit</h1>
+
+<h4>Account_Move</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Edit">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input type="hidden" asp-for="ID" />
+            <div class="form-group">
+                <label asp-for="Doc_Name" class="control-label"></label>
+                <input asp-for="Doc_Name" class="form-control" />
+                <span asp-validation-for="Doc_Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Total_Amount" class="control-label"></label>
+                <input asp-for="Total_Amount" class="form-control" />
+                <span asp-validation-for="Total_Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Date_Created" class="control-label"></label>
+                <input asp-for="Date_Created" class="form-control" />
+                <span asp-validation-for="Date_Created" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Taxed_Amount" class="control-label"></label>
+                <input asp-for="Taxed_Amount" class="form-control" />
+                <span asp-validation-for="Taxed_Amount" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Source_Doc" class="control-label"></label>
+                <select asp-for="Source_Doc" class="form-control" asp-items="ViewBag.Source_Doc"></select>
+                <span asp-validation-for="Source_Doc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Status" class="control-label"></label>
+                <input asp-for="Status" class="form-control" />
+                <span asp-validation-for="Status" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="operation_type" class="control-label"></label>
+                <input asp-for="operation_type" class="form-control" />
+                <span asp-validation-for="operation_type" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="tax" class="control-label"></label>
+                <input asp-for="tax" class="form-control" />
+                <span asp-validation-for="tax" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="purchase_source_doc" class="control-label"></label>
+                <select asp-for="purchase_source_doc" class="form-control" asp-items="ViewBag.purchase_source_doc"></select>
+                <span asp-validation-for="purchase_source_doc" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Save" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-action="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
