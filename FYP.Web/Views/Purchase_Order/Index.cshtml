@@ -58,6 +58,14 @@
                 <a asp-action="Edit" asp-route-id="@item.purchase_id">Edit</a> |
                 <a asp-action="Details" asp-route-id="@item.purchase_id">Details</a> |
                 <a asp-action="Delete" asp-route-id="@item.purchase_id">Delete</a>
+                    @if (item.state == "RFQ" || item.state == "RFQ Sent")
+                    {
+                        <p>| <a asp-action="ConfirmPurchaseOrder" asp-route-id="@item.purchase_id">Confirm</a></p>
+                    }
+                    @if (item.state == "Purchase Order")
+                    {
+                        <p>| <a asp-action="CreateBill" asp-route-id="@item.purchase_id">Create Bill</a></p>
+                    }
             </td>
         </tr>
 }

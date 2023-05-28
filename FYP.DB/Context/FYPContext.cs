@@ -164,7 +164,6 @@ public partial class FYPContext : DbContext
         {
             entity.HasKey(e => e.ID).HasName("PK_sale_order_details");
 
-            entity.Property(e => e.ID).ValueGeneratedNever();
             entity.Property(e => e.price).HasDefaultValueSql("((0.00))");
             entity.Property(e => e.quantity).HasDefaultValueSql("((1))");
 

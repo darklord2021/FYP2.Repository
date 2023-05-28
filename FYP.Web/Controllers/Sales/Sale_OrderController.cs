@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using FYP.DB.ViewModels;
 
 namespace FYP.Web.Controllers.Sales
 {
@@ -49,29 +50,78 @@ namespace FYP.Web.Controllers.Sales
         }
 
         // GET: Sale_Order/Create
+        //public IActionResult Create()
+        //{
+        //    ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id");
+        //    ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name");
+        //    return View();
+        //}
+
         public IActionResult Create()
         {
-            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id");
+            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_name");
             ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name");
-            return View();
+            var viewModel = new SalesViewModel
+            {
+                SaleOrder = new Sale_Order(),
+                SaleItems = new List<Sale_Order_Detail>(),
+            };
+
+            return View(viewModel);
         }
 
+
         // POST: Sale_Order/Create
+        //public async Task<IActionResult> Create([Bind("sale_id,customer_id,name,total_amount,payment_method,date_created,state")] Sale_Order sale_Order)
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("sale_id,customer_id,name,total_amount,payment_method,date_created,state")] Sale_Order sale_Order)
+        public async Task<IActionResult> Create(SalesViewModel viewModel)
         {
-            //    if (ModelState.IsValid)
-            //    {
-            _context.Add(sale_Order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            ////    if (ModelState.IsValid)
+            ////    {
+            //_context.Add(sale_Order);
+            //    await _context.SaveChangesAsync();
+            //    return RedirectToAction(nameof(Index));
+            ////}
+            ////ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
+            ////ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
+            ////return View(sale_Order);
+
+            //if (ModelState.IsValid)
+            //{
+                // Save the sale order header to the database
+                _context.Sale_Orders.Add(viewModel.SaleOrder);
+                _context.SaveChanges();
+
+                // Associate the line items with the sale order
+                
+                foreach (var item in viewModel.SaleItems)
+                {
+                //if (_context.Entry(item).State == EntityState.Detached)
+                //{
+                //    // Detach the entity if it is being tracked
+                //    _context.Entry(item).State = EntityState.Detached;
+                //}
+                //item.sale_id = viewModel.SaleOrder.sale_id;
+                //    _context.Sale_Order_Details.Add(item);
+                var lineItem = new Sale_Order_Detail
+                {
+                    sale_id = viewModel.SaleOrder.sale_id,
+                    product_id = item.product_id,
+                    quantity = item.quantity,
+                    price = item.price
+                };
+                _context.Sale_Order_Details.Add(lineItem);
+                _context.SaveChanges();
+            }
+
+
+                // Redirect to a success page or take appropriate action
+                return RedirectToAction("Index");
             //}
-            //ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
-            //ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
-            //return View(sale_Order);
+            return View(viewModel);
         }
 
         // GET: Sale_Order/Edit/5
@@ -235,7 +285,7 @@ namespace FYP.Web.Controllers.Sales
         }
 
         [HttpGet]
-        [ValidateAntiForgeryToken]
+        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateInvoice(int id)
         {
             // Find the sale order by ID

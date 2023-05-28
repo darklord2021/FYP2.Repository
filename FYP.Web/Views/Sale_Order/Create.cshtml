@@ -1,4 +1,4 @@
-﻿@model FYP.DB.DBTables.Sale_Order
+﻿@*@model FYP.DB.DBTables.Sale_Order
 
 @{
     ViewData["Title"] = "Create";
@@ -31,11 +31,98 @@
         </form>
     </div>
 </div>
-
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+*@
+
+@model FYP.DB.ViewModels.SalesViewModel
+
+@using (Html.BeginForm("Create", "Sale_Order", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
+    <div>
+        <h4>Sale Order Information</h4>
+        <div class="row"></div>
+        <div class="form-group">
+            <label asp-for="SaleOrder.name" class="control-label"></label>
+            <input asp-for="SaleOrder.name" class="form-control" />
+            <span asp-validation-for="SaleOrder.name" class="text-danger"></span>
+        </div>
+
+        <div class="form-group">
+            <label asp-for="SaleOrder.customer_id" class="control-label"></label>
+            @*<input asp-for="SaleOrder.customer_id" class="form-control" />*@
+            @Html.DropDownList("SaleOrder.customer_id", (SelectList)ViewData["customer_id"], "Select a customer", new { @class = "form-control" })
+            <span asp-validation-for="SaleOrder.customer_id" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SaleOrder.payment_method" class="control-label"></label>
+            @*<input asp-for="SaleOrder.payment_method" class="form-control" />*@
+            @Html.DropDownList("SaleOrder.payment_method", (SelectList)ViewData["payment_method"], "Select a payment method", new { @class = "form-control" })
+            <span asp-validation-for="SaleOrder.payment_method" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div>
+        <h4>Line Items</h4>
+
+        <table class="table table-bordered border-dark">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SaleItems.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input asp-for="SaleItems[i].product_id" class="form-control" />
+                            <span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="SaleItems[i].quantity" class="form-control" />
+                            <span asp-validation-for="SaleItems[i].quantity" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="SaleItems[i].price" class="form-control" />
+                            <span asp-validation-for="SaleItems[i].price" class="text-danger"></span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+                            <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+}
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            $('#addLineItem').click(function () {
+                var index = $('table tbody tr').length;
+
+                var newRow = '<tr>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].product_id" /></td>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '</tr>';
+
+                $('table tbody').append(newRow);
+            });
+        });
+    </script>
 }

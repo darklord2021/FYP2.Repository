@@ -233,7 +233,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             if (count > 0)
             {
                 await _context.SaveChangesAsync();
-                TempData["SalePopupMessage"] = "Sale Order confirmed.";
+                TempData["SalePopupMessage"] = "cannot Validate.";
 
                 return RedirectToAction(nameof(Index));
             }

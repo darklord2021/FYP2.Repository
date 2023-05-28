@@ -1,0 +1,38 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+}
+
+@model FYP.DB.DBTables.Sale_Order_Detail
+
+    <div class="col">
+        <table class="table table-bordered border-dark">
+            <tr>
+                <th>
+                @Html.DisplayNameFor(model => model.product)
+                </th>
+            <th>
+                @Html.DisplayNameFor(model => model.quantity)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.price)
+            </th>
+            <th>Action</th>
+            </tr>
+            <tr>
+                <td>
+                <select asp-for="product_id" class="form-control" asp-items="ViewBag.product_id"></select>
+                </td>
+                <td>
+                <input asp-for="quantity" class="form-control" />
+                </td>
+                <td>
+                <input asp-for="price" class="form-control"/>
+                </td>
+                <td>
+                    <a asp-action="Create" asp-controller="Sale_Order_Detail">Add</a>
+                </td>
+            </tr>
+        </table>
+    </div>

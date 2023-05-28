@@ -177,7 +177,7 @@ namespace FYP.Web.Controllers.Purchase
         //[ValidateAntiForgeryToken]
         public async Task<IActionResult> ConfirmPurchaseOrder(int id)
         {
-            // Find the sale order by ID
+            // Find the purchase order by ID
             var purchaseOrder = await _context.Purchase_Orders
                 .Include(po => po.Purchase_Order_Details)
                 .FirstOrDefaultAsync(po => po.purchase_id == id);
