@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
 using FYP.DB.ViewModels;
+using FYP.Services;
+using FYP.Web.DBTables;
 
 namespace FYP.Web.Controllers.Sales
 {
@@ -16,10 +18,13 @@ namespace FYP.Web.Controllers.Sales
         private int count = 0;
 
         private readonly FYPContext _context;
+        private readonly PDF_Generator _pdfGenerator;
 
-        public Sale_OrderController(FYPContext context)
+
+        public Sale_OrderController(FYPContext context, PDF_Generator pdfGenerator)
         {
             _context = context;
+            _pdfGenerator = pdfGenerator;
         }
 
         // GET: Sale_Order
@@ -32,7 +37,28 @@ namespace FYP.Web.Controllers.Sales
         // GET: Sale_Order/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Sale_Orders == null)
+            //var viewModel = new SalesViewModel
+            //{
+            //    SaleOrder = new Sale_Order(),
+            //    SaleItems = new List<Sale_Order_Detail>(),
+            //};
+            //if (id == null || _context.Sale_Orders == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var sale_Order = await _context.Sale_Orders
+            //    .Include(s => s.customer)
+            //    .Include(s => s.payment_methodNavigation)
+            //    .FirstOrDefaultAsync(m => m.sale_id == id);
+            //if (sale_Order == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //return View(viewModel);
+
+            if (id == null)
             {
                 return NotFound();
             }
@@ -41,30 +67,35 @@ namespace FYP.Web.Controllers.Sales
                 .Include(s => s.customer)
                 .Include(s => s.payment_methodNavigation)
                 .FirstOrDefaultAsync(m => m.sale_id == id);
+
             if (sale_Order == null)
             {
                 return NotFound();
             }
 
-            return View(sale_Order);
+            var viewModel = new SalesViewModel
+            {
+                SaleOrder = sale_Order,
+                SaleItems = await _context.Sale_Order_Details
+                .Include(d=>d.product)
+            .Where(d => d.sale_id == id)
+            .ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         // GET: Sale_Order/Create
-        //public IActionResult Create()
-        //{
-        //    ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id");
-        //    ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name");
-        //    return View();
-        //}
 
         public IActionResult Create()
         {
             ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_name");
             ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name");
+            ViewData["product_id"] = new SelectList(_context.Products, "product_id", "name");
             var viewModel = new SalesViewModel
             {
-                SaleOrder = new Sale_Order(),
-                SaleItems = new List<Sale_Order_Detail>(),
+                SaleOrder = new DB.DBTables.Sale_Order(),
+                SaleItems = new List<DB.DBTables.Sale_Order_Detail>(),
             };
 
             return View(viewModel);
@@ -79,47 +110,31 @@ namespace FYP.Web.Controllers.Sales
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SalesViewModel viewModel)
         {
-            ////    if (ModelState.IsValid)
-            ////    {
-            //_context.Add(sale_Order);
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            ////}
-            ////ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
-            ////ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
-            ////return View(sale_Order);
+            // Save the sale order header to the database
+            _context.Sale_Orders.Add(viewModel.SaleOrder);
+            _context.SaveChanges();
 
-            //if (ModelState.IsValid)
-            //{
-                // Save the sale order header to the database
-                _context.Sale_Orders.Add(viewModel.SaleOrder);
-                _context.SaveChanges();
+            // Associate the line items with the sale order
 
-                // Associate the line items with the sale order
-                
-                foreach (var item in viewModel.SaleItems)
-                {
-                //if (_context.Entry(item).State == EntityState.Detached)
-                //{
-                //    // Detach the entity if it is being tracked
-                //    _context.Entry(item).State = EntityState.Detached;
-                //}
-                //item.sale_id = viewModel.SaleOrder.sale_id;
-                //    _context.Sale_Order_Details.Add(item);
-                var lineItem = new Sale_Order_Detail
+            foreach (var item in viewModel.SaleItems)
+            {
+                var lineItem = new DB.DBTables.Sale_Order_Detail
                 {
                     sale_id = viewModel.SaleOrder.sale_id,
                     product_id = item.product_id,
                     quantity = item.quantity,
                     price = item.price
                 };
-                _context.Sale_Order_Details.Add(lineItem);
-                _context.SaveChanges();
+                //if (lineItem.quantity < lineItem.product.quantity)
+                //{
+                    _context.Sale_Order_Details.Add(lineItem);
+                    _context.SaveChanges();
+                //}
             }
 
 
-                // Redirect to a success page or take appropriate action
-                return RedirectToAction("Index");
+            // Redirect to a success page or take appropriate action
+            return RedirectToAction("Index");
             //}
             return View(viewModel);
         }
@@ -127,57 +142,93 @@ namespace FYP.Web.Controllers.Sales
         // GET: Sale_Order/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
+            //if (id == null || _context.Sale_Orders == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var sale_Order = await _context.Sale_Orders.FindAsync(id);
+            //if (sale_Order == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
+            //ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
+            //return View(sale_Order);
+
             if (id == null || _context.Sale_Orders == null)
             {
                 return NotFound();
             }
 
-            var sale_Order = await _context.Sale_Orders.FindAsync(id);
+            var sale_Order = await _context.Sale_Orders
+                            .Include(s => s.customer)
+                            .Include(s => s.payment_methodNavigation)
+                            .FirstOrDefaultAsync(m => m.sale_id == id); 
             if (sale_Order == null)
             {
                 return NotFound();
             }
+
+            var viewModel = new SalesViewModel
+            {
+                SaleOrder = sale_Order,
+                SaleItems = await _context.Sale_Order_Details
+                .Include(d => d.product)
+            .Where(d => d.sale_id == id)
+            .ToListAsync()
+            };
+            ViewData["product_id"] = new SelectList(_context.Products, "product_id", "name");
+
             ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
             ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
-            return View(sale_Order);
+            return View(viewModel);
+
         }
 
         // POST: Sale_Order/Edit/5
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("sale_id,customer_id,name,total_amount,payment_method,date_created,state")] Sale_Order sale_Order)
+        //public async Task<IActionResult> Edit(int id, [Bind("sale_id,customer_id,name,total_amount,payment_method,date_created,state")] Sale_Order sale_Order)
+            public async Task<IActionResult> Edit(int id, SalesViewModel viewModel)
         {
-            if (id != sale_Order.sale_id)
+            if (id != viewModel.SaleOrder.sale_id)
             {
                 return NotFound();
             }
 
             //if (ModelState.IsValid)
             //{
-                try
+            try
+            {
+                _context.Update(viewModel.SaleOrder);
+                await _context.SaveChangesAsync();
+                _context.Update(viewModel.SaleItems);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Sale_OrderExists(viewModel.SaleOrder.sale_id))
                 {
-                    _context.Update(sale_Order);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!Sale_OrderExists(sale_Order.sale_id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(Index));
             //}
-            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", sale_Order.customer_id);
-            ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", sale_Order.payment_method);
-            return View(sale_Order);
+            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", viewModel.SaleOrder.customer_id);
+            ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", viewModel.SaleOrder.payment_method);
+            return View(viewModel);
         }
+
 
         // GET: Sale_Order/Delete/5
         public async Task<IActionResult> Delete(int? id)
@@ -213,14 +264,14 @@ namespace FYP.Web.Controllers.Sales
             {
                 _context.Sale_Orders.Remove(sale_Order);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool Sale_OrderExists(int id)
         {
-          return (_context.Sale_Orders?.Any(e => e.sale_id == id)).GetValueOrDefault();
+            return (_context.Sale_Orders?.Any(e => e.sale_id == id)).GetValueOrDefault();
         }
 
 
@@ -253,12 +304,13 @@ namespace FYP.Web.Controllers.Sales
             await _context.SaveChangesAsync();
 
             // Add items to the transfer table
-            var transfer = new Transfer
+            var transfer = new DB.DBTables.Transfer
             {
                 Doc_name = "WH-OUT/" + DateTime.Now.Date.Year + "/" + DateTime.Now.Date.Month + "/" + DateTime.Now.Date.Day + "/" + saleOrder.name,
                 Source_Document = saleOrder.name,
                 created_date = DateTime.Now.Date,
-                status = "Initial"
+                status = "Initial",
+                operation_type = "DN"
             };
 
             _context.Transfers.Add(transfer);
@@ -267,7 +319,7 @@ namespace FYP.Web.Controllers.Sales
             // Add details to the transfer detail table
             foreach (var item in saleOrder.Sale_Order_Details)
             {
-                var transferDetail = new Transfer_Detail
+                var transferDetail = new DB.DBTables.Transfer_Detail
                 {
                     transfer_id = transfer.ID,
                     product_id = item.product_id,
@@ -310,7 +362,7 @@ namespace FYP.Web.Controllers.Sales
                 {
                     if (transfer.status == "Done")
                     {
-                        var invoice = new Account_Move
+                        var invoice = new DB.DBTables.Account_Move
                         {
                             Doc_Name = "INV/" + DateTime.Now.Date.Year + "/" + DateTime.Now.Date.Month + "/" + DateTime.Now.Date.Day + "/" + (++count),
                             Source_Doc = saleOrder.name,
@@ -324,7 +376,7 @@ namespace FYP.Web.Controllers.Sales
                         // Add details to the transfer detail table
                         foreach (var item in saleOrder.Sale_Order_Details)
                         {
-                            var invoicelines = new Invoice_line
+                            var invoicelines = new DB.DBTables.Invoice_line
                             {
                                 account_id = invoice.ID,
                                 product_id = item.product_id,
@@ -352,6 +404,19 @@ namespace FYP.Web.Controllers.Sales
                 await _context.SaveChangesAsync();
             }
             return RedirectToAction(nameof(Index));
+        }
+
+
+        public IActionResult GeneratePDF(long id)
+        {
+            string data = "";
+            var pdfBytes = _pdfGenerator.GetHTMLPageAsPDF(id, data);
+
+            // Set the response headers
+            Response.Headers.Add("Content-Length", pdfBytes.Length.ToString());
+            Response.Headers.Add("Content-Disposition", "inline; filename=Document_" + id + ".pdf");
+
+            return File(pdfBytes, "application/pdf");
         }
     }
 }

@@ -1,45 +1,109 @@
-﻿@*@model FYP.DB.DBTables.Sale_Order
+﻿@*@using Microsoft.EntityFrameworkCore.Metadata.Internal;
+@model FYP.DB.ViewModels.SalesViewModel
 
-@{
-    ViewData["Title"] = "Create";
-}
+@using (Html.BeginForm("Create", "Sale_Order", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
 
-<h1>Create</h1>
+    <div>
+        <h4>Sale Order Information</h4>
+        <div class="row"></div>
+        <div class="form-group">
+            <label asp-for="SaleOrder.name" class="control-label"></label>
+            <input asp-for="SaleOrder.name" class="form-control" />
+            <span asp-validation-for="SaleOrder.name" class="text-danger"></span>
+        </div>
 
-<h4>Sale_Order</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="customer_id" class="control-label"></label>
-                <select asp-for="customer_id" class ="form-control" asp-items="ViewBag.customer_id"></select>
-            </div>
-            <div class="form-group">
-                <label asp-for="name" class="control-label"></label>
-                <input asp-for="name" class="form-control" />
-                <span asp-validation-for="name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="payment_method" class="control-label"></label>
-                <select asp-for="payment_method" class ="form-control" asp-items="ViewBag.payment_method"></select>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        <div class="form-group">
+            <label asp-for="SaleOrder.customer_id" class="control-label"></label>
+            <input asp-for="SaleOrder.customer_id" class="form-control" />
+            @Html.DropDownList("SaleOrder.customer_id", (SelectList)ViewData["customer_id"], "Select a customer", new { @class = "form-control" })
+            <span asp-validation-for="SaleOrder.customer_id" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="SaleOrder.payment_method" class="control-label"></label>
+            <input asp-for="SaleOrder.payment_method" class="form-control" />
+            @Html.DropDownList("SaleOrder.payment_method", (SelectList)ViewData["payment_method"], "Select a payment method", new { @class = "form-control" })
+            <span asp-validation-for="SaleOrder.payment_method" class="text-danger"></span>
+        </div>
     </div>
-</div>
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
+
+    <div>
+        <div class="row">
+            <div class="col-9">
+        <h4>Line Items</h4>
+            </div>
+            <div class="col-3 text-right">
+        <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+            </div>
+        </div>
+        <br>
+
+        <table class="table table-bordered border-dark">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.SaleItems.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            <input asp-for="SaleItems[i].product_id" class="form-control" />
+                            @Html.DropDownList("SaleItems["+i+"].product_id", (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })
+                            <span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="SaleItems[i].quantity" class="form-control" />
+                            <span asp-validation-for="SaleItems[i].quantity" class="text-danger"></span>
+                        </td>
+                        <td>
+                            <input asp-for="SaleItems[i].price" class="form-control" />
+                            <span asp-validation-for="SaleItems[i].price" class="text-danger"></span>
+                        </td>
+
+                    </tr>
+                }
+            </tbody>
+        </table>
+                            <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+
+    </div>
+
+    <div class="form-group">
+        <input type="submit" value="Create" class="btn btn-primary" />
+    </div>
+}
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            $('#addLineItem').click(function () {
+                var index = $('table tbody tr').length;
+
+                var newRow = '<tr>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].product_id"/></td>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
+                    '<td><input class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '</tr>';
+
+                $('table tbody').append(newRow);
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+
 }
+
+
 *@
 
+@using Microsoft.EntityFrameworkCore.Metadata.Internal;
 @model FYP.DB.ViewModels.SalesViewModel
 
 @using (Html.BeginForm("Create", "Sale_Order", FormMethod.Post))
@@ -70,7 +134,15 @@
     </div>
 
     <div>
-        <h4>Line Items</h4>
+        <div class="row">
+            <div class="col-9">
+                <h4>Line Items</h4>
+            </div>
+            <div class="col-3 text-right">
+                <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+            </div>
+        </div>
+        <br>
 
         <table class="table table-bordered border-dark">
             <thead>
@@ -78,14 +150,15 @@
                     <th>Product Name</th>
                     <th>Quantity</th>
                     <th>Price</th>
+                    <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
+            <tbody id="lineItemsBody">
                 @for (int i = 0; i < Model.SaleItems.Count; i++)
                 {
                     <tr>
                         <td>
-                            <input asp-for="SaleItems[i].product_id" class="form-control" />
+                            @Html.DropDownListFor(model => model.SaleItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })
                             <span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>
                         </td>
                         <td>
@@ -96,12 +169,13 @@
                             <input asp-for="SaleItems[i].price" class="form-control" />
                             <span asp-validation-for="SaleItems[i].price" class="text-danger"></span>
                         </td>
+                        <td>
+                            <button type="button" class="btn btn-danger removeLineItem">Remove</button>
+                        </td>
                     </tr>
                 }
             </tbody>
         </table>
-                            <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
-
     </div>
 
     <div class="form-group">
@@ -112,17 +186,35 @@
 @section Scripts {
     <script>
         $(document).ready(function () {
-            $('#addLineItem').click(function () {
-                var index = $('table tbody tr').length;
+            var index = @Model.SaleItems.Count;
 
+            $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
-                    '<td><input class="form-control" name="SaleItems[' + index + '].product_id" /></td>' +
+                    '<td><select class="form-control" name="SaleItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
                     '<td><input class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
                     '<td><input class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 
-                $('table tbody').append(newRow);
+                $('#lineItemsBody').append(newRow);
+
+                var select = $('select[name="SaleItems[' + index + '].product_id"]');
+                $.get('@Url.Action("GetProducts", "Products")', function (data) {
+                    select.empty();
+                    $.each(data, function (index, item) {
+                        select.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                });
+
+                index++;
+            });
+
+            $(document).on('click', '.removeLineItem', function () {
+                $(this).closest('tr').remove();
             });
         });
     </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

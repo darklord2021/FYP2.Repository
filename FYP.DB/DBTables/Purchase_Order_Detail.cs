@@ -1,30 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
 public partial class Purchase_Order_Detail
 {
-    [Key]
     public int ID { get; set; }
-
+    [Display(Name ="Purchase ID")]
     public int? purchase_id { get; set; }
-
+    [Display(Name = "Product")]
     public int? product_id { get; set; }
-
+    [Display(Name = "Quantity")]
     public int? quantity { get; set; }
-
-    [Column(TypeName = "money")]
+    [Display(Name = "Price")]
     public decimal? price { get; set; }
 
-    [ForeignKey("product_id")]
-    [InverseProperty("Purchase_Order_Details")]
     public virtual Product? product { get; set; }
 
-    [ForeignKey("purchase_id")]
-    [InverseProperty("Purchase_Order_Details")]
     public virtual Purchase_Order? purchase { get; set; }
 }

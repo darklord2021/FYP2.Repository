@@ -60,6 +60,7 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
         {
             //if (ModelState.IsValid)
             //{
+            
                 _context.Add(category);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
@@ -99,7 +100,8 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
             //{
                 try
                 {
-                    _context.Update(category);
+                category.last_modified = DateTime.Now;
+                _context.Update(category);
                     await _context.SaveChangesAsync();
                 }
                 catch (DbUpdateConcurrencyException)

@@ -1,4 +1,5 @@
-﻿@model FYP.DB.DBTables.Sale_Order
+﻿@*@model FYP.DB.DBTables.Sale_Order*@
+@model FYP.DB.ViewModels.SalesViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,44 +12,82 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.name)
+            @Html.DisplayNameFor(model => model.SaleOrder.name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.name)
+            @Html.DisplayFor(model => model.SaleOrder.name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.total_amount)
+            @Html.DisplayNameFor(model => model.SaleOrder.total_amount)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.total_amount)
+            @Html.DisplayFor(model => model.SaleOrder.total_amount)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.date_created)
+            @Html.DisplayNameFor(model => model.SaleOrder.date_created)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.date_created)
+            @Html.DisplayFor(model => model.SaleOrder.date_created)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.state)
+            @Html.DisplayNameFor(model => model.SaleOrder.state)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.state)
+            @Html.DisplayFor(model => model.SaleOrder.state)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.customer)
+            @Html.DisplayNameFor(model => model.SaleOrder.customer)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.customer.customer_id)
+            @Html.DisplayFor(model => model.SaleOrder.customer.customer_id)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.payment_methodNavigation)
+            @Html.DisplayNameFor(model => model.SaleOrder.payment_methodNavigation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.payment_methodNavigation.method_name)
+            @Html.DisplayFor(model => model.SaleOrder.payment_methodNavigation.method_name)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.sale_id">Edit</a> |
+    <div>
+        
+        <table class="table table-bordered border-dark">
+            <thead>
+                <tr>
+                    <th>Product Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    @*<th>Action</th>*@
+                </tr>
+            </thead>
+            <tbody id="lineItemsBody">
+                @for (int i = 0; i < Model.SaleItems.Count; i++)
+                {
+                    <tr>
+                        <td>
+                            @*@Html.DropDownListFor(model => model.SaleItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })*@
+                            @*<span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>*@
+                            @Html.DisplayFor(model=> model.SaleItems[i].product.name)
+                        </td>
+                        <td>
+                            @*<input asp-for="SaleItems[i].quantity" class="form-control" />*@
+                            @*<span asp-validation-for="SaleItems[i].quantity" class="text-danger"></span>*@
+                            @Html.DisplayFor(model=> model.SaleItems[i].quantity)
+                        </td>
+                        <td>
+                            @*<input asp-for="SaleItems[i].price" class="form-control" />*@
+                            @*<span asp-validation-for="SaleItems[i].price" class="text-danger"></span>*@
+                            @Html.DisplayFor(model=> model.SaleItems[i].price)
+                        </td>
+                        @*<td>
+                            <button type="button" class="btn btn-danger removeLineItem">Remove</button>
+                        </td>*@
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+    <a asp-action="Edit" asp-route-id="@Model?.SaleOrder.sale_id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

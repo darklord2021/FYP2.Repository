@@ -1,28 +1,22 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
 public partial class Invoice_line
 {
-    [Key]
     public int ID { get; set; }
-
+    [Display(Name = "Product")]
     public int product_id { get; set; }
-
+    [Display(Name = "Quantity")]
     public int qty { get; set; }
-
-    [Column(TypeName = "money")]
+    [Display(Name = "Unit Price")]
     public decimal price { get; set; }
-
+    [Display(Name = "Taxes")]
     public double taxes { get; set; }
-
+    [Display(Name = "Account")]
     public int account_id { get; set; }
 
-    [ForeignKey("account_id")]
-    [InverseProperty("Invoice_lines")]
     public virtual Account_Move account { get; set; } = null!;
 }

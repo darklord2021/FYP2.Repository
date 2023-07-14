@@ -1,4 +1,4 @@
-﻿@model FYP.DB.DBTables.Purchase_Order
+﻿@model FYP.DB.ViewModels.PurchaseViewModel
 
 @{
     ViewData["Title"] = "Create";
@@ -13,22 +13,22 @@
         <form asp-action="Create">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="vendor_id" class="control-label"></label>
-                <select asp-for="vendor_id" class ="form-control" asp-items="ViewBag.vendor_id"></select>
+                <label asp-for="PurchaseOrder.vendor_id" class="control-label"></label>
+                <select asp-for="PurchaseOrder.vendor_id" class="form-control" asp-items="ViewBag.vendor_id"></select>
             </div>
             <div class="form-group">
-                <label asp-for="doc_name" class="control-label"></label>
-                <input asp-for="doc_name" class="form-control" />
-                <span asp-validation-for="doc_name" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.doc_name" class="control-label"></label>
+                <input asp-for="PurchaseOrder.doc_name" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.doc_name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="create_date" class="control-label"></label>
-                <input asp-for="create_date" class="form-control" />
-                <span asp-validation-for="create_date" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.create_date" class="control-label"></label>
+                <input asp-for="PurchaseOrder.create_date" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.create_date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="payment_method" class="control-label"></label>
-                <select asp-for="payment_method" class ="form-control" asp-items="ViewBag.payment_method"></select>
+                <label asp-for="PurchaseOrder.payment_method" class="control-label"></label>
+                <select asp-for="PurchaseOrder.payment_method" class="form-control" asp-items="ViewBag.payment_method"></select>
             </div>
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
@@ -38,9 +38,90 @@
 </div>
 
 <div>
+    <div class="row">
+        <div class="col-9">
+            <h4>Line Items</h4>
+        </div>
+        <div class="col-3 text-right">
+            <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+        </div>
+    </div>
+    <br>
+
+    <table class="table table-bordered border-dark">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="lineItemsBody">
+            @for (int i = 0; i < Model.PurchaseItems.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DropDownListFor(model => model.PurchaseItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })
+                        <span asp-validation-for="PurchaseItems[i].product_id" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="PurchaseItems[i].quantity" class="form-control" />
+                        <span asp-validation-for="PurchaseItems[i].quantity" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="PurchaseItems[i].price" class="form-control" />
+                        <span asp-validation-for="PurchaseItems[i].price" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger removeLineItem">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+
+<div>
     <a asp-action="Index">Back to List</a>
 </div>
 
-@section Scripts {
+@*@section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}
+*@
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            var index = @Model.PurchaseItems.Count;
+
+            $('#addLineItem').click(function () {
+                var newRow = '<tr>' +
+                    '<td><select class="form-control" name="PurchaseItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
+                    '<td><input class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
+                    '<td><input class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
+                    '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
+                    '</tr>';
+
+                $('#lineItemsBody').append(newRow);
+
+                var select = $('select[name="PurchaseItems[' + index + '].product_id"]');
+                $.get('@Url.Action("GetProducts", "Products")', function (data) {
+                    select.empty();
+                    $.each(data, function (index, item) {
+                        select.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                });
+
+                index++;
+            });
+
+            $(document).on('click', '.removeLineItem', function () {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

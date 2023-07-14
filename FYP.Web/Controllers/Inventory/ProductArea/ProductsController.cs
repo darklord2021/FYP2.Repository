@@ -25,7 +25,16 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
             var fYPContext = _context.Products.Include(p => p.category);
             return View(await fYPContext.ToListAsync());
         }
+        public IActionResult GetProducts()
+        {
+            var products = _context.Products.Select(p => new SelectListItem
+            {
+                Value = p.product_id.ToString(),
+                Text = p.name
+            }).ToList();
 
+            return Json(products);
+        }
         // GET: Products/Details/5
         public async Task<IActionResult> Details(int? id)
         {

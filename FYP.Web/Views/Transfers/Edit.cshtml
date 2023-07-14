@@ -1,4 +1,4 @@
-﻿@model FYP.DB.DBTables.Transfer
+﻿@model FYP.DB.ViewModels.TransferViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,31 +12,31 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="ID" />
+            <input type="hidden" asp-for="Transfer.ID" />
             <div class="form-group">
-                <label asp-for="Doc_name" class="control-label"></label>
-                <input asp-for="Doc_name" class="form-control" />
-                <span asp-validation-for="Doc_name" class="text-danger"></span>
+                <label asp-for="Transfer.Doc_name" class="control-label"></label>
+                <input asp-for="Transfer.Doc_name" class="form-control" />
+                <span asp-validation-for="Transfer.Doc_name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Source_Document" class="control-label"></label>
-                <input asp-for="Source_Document" class="form-control" />
-                <span asp-validation-for="Source_Document" class="text-danger"></span>
+                <label asp-for="Transfer.Source_Document" class="control-label"></label>
+                <input asp-for="Transfer.Source_Document" class="form-control" />
+                <span asp-validation-for="Transfer.Source_Document" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="created_date" class="control-label"></label>
-                <input asp-for="created_date" class="form-control" />
-                <span asp-validation-for="created_date" class="text-danger"></span>
+                <label asp-for="Transfer.created_date" class="control-label"></label>
+                <input asp-for="Transfer.created_date" class="form-control" />
+                <span asp-validation-for="Transfer.created_date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="backorder_doc_id" class="control-label"></label>
-                <select asp-for="backorder_doc_id" class="form-control" asp-items="ViewBag.backorder_doc_id"></select>
-                <span asp-validation-for="backorder_doc_id" class="text-danger"></span>
+                <label asp-for="Transfer.backorder_doc_id" class="control-label"></label>
+                <select asp-for="Transfer.backorder_doc_id" class="form-control" asp-items="ViewBag.backorder_doc_id"></select>
+                <span asp-validation-for="Transfer.backorder_doc_id" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="status" class="control-label"></label>
-                <input asp-for="status" class="form-control" />
-                <span asp-validation-for="status" class="text-danger"></span>
+                <label asp-for="Transfer.status" class="control-label"></label>
+                <input asp-for="Transfer.status" class="form-control" />
+                <span asp-validation-for="Transfer.status" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -45,10 +45,86 @@
     </div>
 </div>
 
+<div class="row">
+    <div class="col-9">
+        <h4>Line Items</h4>
+    </div>
+    <div class="col-3 text-right">
+        <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+    </div>
+</div>
+<br>
+<div class="row">
+    <table class="table table-bordered border-dark">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Demand</th>
+                <th>Done</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="lineItemsBody">
+            @for (int i = 0; i < Model.LineItems.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @Html.DropDownListFor(model => model.LineItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })
+                        <span asp-validation-for="LineItems[i].product_id" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="LineItems[i].demand" class="form-control" />
+                        <span asp-validation-for="LineItems[i].demand" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="LineItems[i].done" class="form-control" />
+                        <span asp-validation-for="LineItems[i].done" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-danger removeLineItem">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
 
+
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            var index = @Model.LineItems.Count;
+
+            $('#addLineItem').click(function () {
+                var newRow = '<tr>' +
+                    '<td><select class="form-control" name="LineItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
+                    '<td><input class="form-control" name="LineItems[' + index + '].demand" /></td>' +
+                    '<td><input class="form-control" name="LineItems[' + index + '].done" /></td>' +
+                    '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
+                    '</tr>';
+
+                $('#lineItemsBody').append(newRow);
+
+                var select = $('select[name="LineItems[' + index + '].product_id"]');
+                $.get('@Url.Action("GetProducts", "Products")', function (data) {
+                    select.empty();
+                    $.each(data, function (index, item) {
+                        select.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                });
+
+                index++;
+            });
+
+            $(document).on('click', '.removeLineItem', function () {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

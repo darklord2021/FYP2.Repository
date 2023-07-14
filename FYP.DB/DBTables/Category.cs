@@ -1,30 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
-[Table("Category")]
 public partial class Category
 {
-    [Key]
     public int category_id { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Required]
+    [Display(Name = "Name")]
     public string category_name { get; set; } = null!;
-
-    [Column(TypeName = "text")]
+    [Required]
+    [Display(Name = "Description")]
     public string? Description { get; set; }
-
-    [Column(TypeName = "date")]
+    [Required]
+    [Display(Name = "Created on")]
     public DateTime? created_on { get; set; }
+    [Display(Name = "Modified on")]
 
-    [Column(TypeName = "date")]
     public DateTime? last_modified { get; set; }
 
-    [InverseProperty("category")]
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }

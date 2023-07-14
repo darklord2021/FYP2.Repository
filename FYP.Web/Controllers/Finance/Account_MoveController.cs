@@ -161,14 +161,31 @@ namespace FYP.Web.Controllers.Finance
             {
                 _context.Account_Moves.Remove(account_Move);
             }
-            
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
         private bool Account_MoveExists(int id)
         {
-          return (_context.Account_Moves?.Any(e => e.ID == id)).GetValueOrDefault();
+            return (_context.Account_Moves?.Any(e => e.ID == id)).GetValueOrDefault();
+        }
+
+        public async Task<IActionResult> MarkasPaid(int id)
+        {
+            var inv = await _context.Account_Moves.FirstOrDefaultAsync(tr => tr.ID == id);
+            if (inv is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                inv.paid = true;
+                _context.Update(inv);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
+            }
         }
     }
 }

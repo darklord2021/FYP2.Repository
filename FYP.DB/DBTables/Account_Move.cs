@@ -1,51 +1,33 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
-[Table("Account_Move")]
 public partial class Account_Move
 {
-    [Key]
     public int ID { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Document Name")]
     public string? Doc_Name { get; set; }
-
-    [Column(TypeName = "money")]
+    [Display(Name = "Total Amount")]
     public decimal? Total_Amount { get; set; }
-
-    [Column(TypeName = "date")]
+    [Display(Name = "Created on")]
     public DateTime? Date_Created { get; set; }
-
+    [Display(Name = "Taxed Amount")]
     public double? Taxed_Amount { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Sales Reference")]
     public string? Source_Doc { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Status")]
     public string? Status { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Operation Type")]
     public string? operation_type { get; set; }
-
+    [Display(Name = "Tax")]
     public double? tax { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Payment Status")]
+    public bool paid { get; set; }
+    [Display(Name = "Purchase Reference")]
     public string? purchase_source_doc { get; set; }
 
-    [InverseProperty("accountNavigation")]
-    public virtual ICollection<Account_Journal> Account_Journals { get; set; } = new List<Account_Journal>();
-
-    [InverseProperty("account")]
     public virtual ICollection<Invoice_line> Invoice_lines { get; set; } = new List<Invoice_line>();
 
     public virtual Sale_Order? Source_DocNavigation { get; set; }

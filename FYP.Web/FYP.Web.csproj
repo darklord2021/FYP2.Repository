@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Context\" />
     <Folder Include="Controllers\Products\" />
   </ItemGroup>
 

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using FYP.DB.ViewModels;
 
 namespace FYP.Web.Controllers.Purchase
 {
@@ -31,21 +32,47 @@ namespace FYP.Web.Controllers.Purchase
         // GET: Purchase_Order/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null || _context.Purchase_Orders == null)
+            //if (id == null || _context.Purchase_Orders == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var purchase_Order = await _context.Purchase_Orders
+            //    .Include(p => p.payment_methodNavigation)
+            //    .Include(p => p.vendor)
+            //    .FirstOrDefaultAsync(m => m.purchase_id == id);
+            //if (purchase_Order == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //return View(purchase_Order);
+
+            if (id == null)
             {
                 return NotFound();
             }
 
             var purchase_Order = await _context.Purchase_Orders
-                .Include(p => p.payment_methodNavigation)
-                .Include(p => p.vendor)
-                .FirstOrDefaultAsync(m => m.purchase_id == id);
+                .Include(s => s.vendor)
+                .Include(s => s.payment_methodNavigation)
+                .FirstOrDefaultAsync(m => m.purchase_id== id);
+
             if (purchase_Order == null)
             {
                 return NotFound();
             }
 
-            return View(purchase_Order);
+            var viewModel = new PurchaseViewModel
+            {
+                PurchaseOrder = purchase_Order,
+                PurchaseItems = await _context.Purchase_Order_Details
+                .Include(d => d.product)
+            .Where(d => d.purchase_id == id)
+            .ToListAsync()
+            };
+
+            return View(viewModel);
         }
 
         // GET: Purchase_Order/Create
@@ -53,43 +80,112 @@ namespace FYP.Web.Controllers.Purchase
         {
             ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name");
             ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name");
-            return View();
+
+            ViewData["product_id"] = new SelectList(_context.Products, "product_id", "name");
+            var viewModel = new PurchaseViewModel
+            {
+                PurchaseOrder = new Purchase_Order(),
+                PurchaseItems = new List<Purchase_Order_Detail>(),
+            };
+            return View(viewModel);
         }
 
         // POST: Purchase_Order/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
+
+        //[HttpPost]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Create([Bind("purchase_id,vendor_id,doc_name,cost,create_date,state,payment_method")] Purchase_Order purchase_Order)
+        //{
+        //    //if (ModelState.IsValid)
+        //    //{
+        //        _context.Add(purchase_Order);
+        //        await _context.SaveChangesAsync();
+        //        return RedirectToAction(nameof(Index));
+        //    //}
+        //    ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
+        //    ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
+        //    return View(purchase_Order);
+        //}
+
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("purchase_id,vendor_id,doc_name,cost,create_date,state,payment_method")] Purchase_Order purchase_Order)
+        public async Task<IActionResult> Create(PurchaseViewModel viewModel)
         {
-            //if (ModelState.IsValid)
-            //{
-                _context.Add(purchase_Order);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+            // Save the sale order header to the database
+            _context.Purchase_Orders.Add(viewModel.PurchaseOrder);
+            _context.SaveChanges();
+
+            // Associate the line items with the sale order
+
+            foreach (var item in viewModel.PurchaseItems)
+            {
+                var lineItem = new Purchase_Order_Detail
+                {
+                    purchase_id = viewModel.PurchaseOrder.purchase_id,
+                    product_id = item.product_id,
+                    quantity = item.quantity,
+                    price = item.price
+                };
+                //if (lineItem.quantity < lineItem.product.quantity)
+                //{
+                _context.Purchase_Order_Details.Add(lineItem);
+                _context.SaveChanges();
+                //}
+            }
+
+
+            // Redirect to a success page or take appropriate action
+            return RedirectToAction("Index");
             //}
-            ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
-            ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
-            return View(purchase_Order);
+            return View(viewModel);
         }
+
 
         // GET: Purchase_Order/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null || _context.Purchase_Orders == null)
+            //if (id == null || _context.Purchase_Orders == null)
+            //{
+            //    return NotFound();
+            //}
+
+            //var purchase_Order = await _context.Purchase_Orders.FindAsync(id);
+            //if (purchase_Order == null)
+            //{
+            //    return NotFound();
+            //}
+            //ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
+            //ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
+            //return View(purchase_Order);
+
+            if (id == null || _context.Purchase_Orders== null)
             {
                 return NotFound();
             }
 
-            var purchase_Order = await _context.Purchase_Orders.FindAsync(id);
+            var purchase_Order = await _context.Purchase_Orders
+                            .Include(s => s.vendor)
+                            .Include(s => s.payment_methodNavigation)
+                            .FirstOrDefaultAsync(m => m.purchase_id== id);
             if (purchase_Order == null)
             {
                 return NotFound();
             }
+
+            var viewModel = new PurchaseViewModel
+            {
+                PurchaseOrder = purchase_Order,
+                PurchaseItems = await _context.Purchase_Order_Details
+                .Include(d => d.product)
+            .Where(d => d.purchase_id == id)
+            .ToListAsync()
+            };
+
+            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", purchase_Order.vendor_id);
             ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
-            ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
-            return View(purchase_Order);
+            return View(viewModel);
         }
 
         // POST: Purchase_Order/Edit/5
@@ -97,36 +193,68 @@ namespace FYP.Web.Controllers.Purchase
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, [Bind("purchase_id,vendor_id,doc_name,cost,create_date,state,payment_method")] Purchase_Order purchase_Order)
+        public async Task<IActionResult> Edit(int id, PurchaseViewModel viewModel)
         {
-            if (id != purchase_Order.purchase_id)
+            //if (id != purchase_Order.purchase_id)
+            //{
+            //    return NotFound();
+            //}
+
+            ////if (ModelState.IsValid)
+            ////{
+            //    try
+            //    {
+            //        _context.Update(purchase_Order);
+            //        await _context.SaveChangesAsync();
+            //    }
+            //    catch (DbUpdateConcurrencyException)
+            //    {
+            //        if (!Purchase_OrderExists(purchase_Order.purchase_id))
+            //        {
+            //            return NotFound();
+            //        }
+            //        else
+            //        {
+            //            throw;
+            //        }
+            //    }
+            //    return RedirectToAction(nameof(Index));
+            ////}
+            //ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
+            //ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
+            //return View(purchase_Order);
+
+            if (id != viewModel.PurchaseOrder.purchase_id)
             {
                 return NotFound();
             }
 
             //if (ModelState.IsValid)
             //{
-                try
+            try
+            {
+                _context.Update(viewModel.PurchaseOrder);
+                await _context.SaveChangesAsync();
+                _context.Update(viewModel.PurchaseItems);
+                await _context.SaveChangesAsync();
+
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!Purchase_OrderExists(viewModel.PurchaseOrder.purchase_id))
                 {
-                    _context.Update(purchase_Order);
-                    await _context.SaveChangesAsync();
+                    return NotFound();
                 }
-                catch (DbUpdateConcurrencyException)
+                else
                 {
-                    if (!Purchase_OrderExists(purchase_Order.purchase_id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+            }
+            return RedirectToAction(nameof(Index));
             //}
-            ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", purchase_Order.payment_method);
-            ViewData["vendor_id"] = new SelectList(_context.Vendors, "vendor_id", "name", purchase_Order.vendor_id);
-            return View(purchase_Order);
+            ViewData["customer_id"] = new SelectList(_context.Customers, "customer_id", "customer_id", viewModel.PurchaseOrder.vendor_id);
+            ViewData["payment_method"] = new SelectList(_context.Payments, "id", "method_name", viewModel.PurchaseOrder.purchase_id);
+            return View(viewModel);
         }
 
         // GET: Purchase_Order/Delete/5
@@ -175,6 +303,7 @@ namespace FYP.Web.Controllers.Purchase
 
         [HttpGet]
         //[ValidateAntiForgeryToken]
+        //Creates GRN and confirms PO
         public async Task<IActionResult> ConfirmPurchaseOrder(int id)
         {
             // Find the purchase order by ID
@@ -229,6 +358,7 @@ namespace FYP.Web.Controllers.Purchase
             return RedirectToAction(nameof(Index));
         }
 
+        //Creates Bill after GRN is Is complete
         public async Task<IActionResult> CreateBill(int id)
         {
             // Find the sale order by ID

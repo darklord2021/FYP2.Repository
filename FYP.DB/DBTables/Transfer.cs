@@ -1,40 +1,34 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
 public partial class Transfer
 {
-    [Key]
+    [Display(Name = "ID")]
     public int ID { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Required]
+    [Display(Name = "Document Name")]
     public string? Doc_name { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Required]
+    [Display(Name = "Source Document")]
     public string? Source_Document { get; set; }
-
-    [Column(TypeName = "date")]
+    [Required]
+    [Display(Name = "Created on")]
     public DateTime? created_date { get; set; }
-
+    [Display(Name = "Backorder of")]
     public int? backorder_doc_id { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Required]
+    [Display(Name = "Status")]
     public string status { get; set; } = null!;
+    [Required]
+    [Display(Name = "Operation Type")]
+    public string? operation_type { get; set; }
 
-    [InverseProperty("backorder_doc")]
     public virtual ICollection<Transfer> Inversebackorder_doc { get; set; } = new List<Transfer>();
 
-    [InverseProperty("transfer")]
     public virtual ICollection<Transfer_Detail> Transfer_Details { get; set; } = new List<Transfer_Detail>();
-
-    [ForeignKey("backorder_doc_id")]
-    [InverseProperty("Inversebackorder_doc")]
+    [Display(Name = "Backorder of")]
     public virtual Transfer? backorder_doc { get; set; }
 }

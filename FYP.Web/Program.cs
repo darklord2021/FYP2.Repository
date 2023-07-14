@@ -1,4 +1,5 @@
 using FYP.DB.Context;
+using FYP.Services;
 using FYP.Web.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,10 @@ builder.Services.AddDbContext<FYPContext>(options => options.UseSqlServer(builde
 builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.RequireConfirmedAccount = true)
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
+
+// Inside ConfigureServices method in Startup.cs
+builder.Services.AddScoped<PDF_Generator>();
+
 
 var app = builder.Build();
 

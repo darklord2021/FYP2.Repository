@@ -1,46 +1,32 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
-[Table("Purchase_Order")]
-[Index("doc_name", Name = "IX_Purchase_Order", IsUnique = true)]
 public partial class Purchase_Order
 {
-    [Key]
     public int purchase_id { get; set; }
 
+    [Display(Name ="Vendor")]
     public int vendor_id { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Document Name")]
     public string doc_name { get; set; } = null!;
-
-    [Column(TypeName = "money")]
+    [Display(Name = "Cost")]
+    [DataType(DataType.Currency)]
     public decimal cost { get; set; }
-
-    [Column(TypeName = "date")]
+    [Display(Name = "Created on")]
     public DateTime? create_date { get; set; }
-
-    [StringLength(50)]
-    [Unicode(false)]
+    [Display(Name = "Status")]
     public string state { get; set; } = null!;
-
+    [Display(Name = "Payment Method")]
     public int payment_method { get; set; }
 
     public virtual ICollection<Account_Move> Account_Moves { get; set; } = new List<Account_Move>();
 
-    [InverseProperty("purchase")]
     public virtual ICollection<Purchase_Order_Detail> Purchase_Order_Details { get; set; } = new List<Purchase_Order_Detail>();
-
-    [ForeignKey("payment_method")]
-    [InverseProperty("Purchase_Orders")]
+    [Display(Name = "Payment Method")]
     public virtual Payment payment_methodNavigation { get; set; } = null!;
-
-    [ForeignKey("vendor_id")]
-    [InverseProperty("Purchase_Orders")]
+    [Display(Name = "Vendor")]
     public virtual Vendor vendor { get; set; } = null!;
 }

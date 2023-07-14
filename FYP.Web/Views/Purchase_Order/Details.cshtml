@@ -1,4 +1,5 @@
-﻿@model FYP.DB.DBTables.Purchase_Order
+﻿@*@model FYP.DB.DBTables.Purchase_Order*@
+@model FYP.DB.ViewModels.PurchaseViewModel
 
 @{
     ViewData["Title"] = "Details";
@@ -11,44 +12,82 @@
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.doc_name)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.doc_name)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.doc_name)
+            @Html.DisplayFor(model => model.PurchaseOrder.doc_name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.cost)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.cost)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.cost)
+            @Html.DisplayFor(model => model.PurchaseOrder.cost)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.create_date)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.create_date)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.create_date)
+            @Html.DisplayFor(model => model.PurchaseOrder.create_date)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.state)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.state)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.state)
+            @Html.DisplayFor(model => model.PurchaseOrder.state)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.payment_methodNavigation)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.payment_methodNavigation)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.payment_methodNavigation.method_name)
+            @Html.DisplayFor(model => model.PurchaseOrder.payment_methodNavigation.method_name)
         </dd>
         <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.vendor)
+            @Html.DisplayNameFor(model => model.PurchaseOrder.vendor)
         </dt>
         <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.vendor.name)
+            @Html.DisplayFor(model => model.PurchaseOrder.vendor.name)
         </dd>
     </dl>
 </div>
 <div>
-    <a asp-action="Edit" asp-route-id="@Model?.purchase_id">Edit</a> |
+
+    <table class="table table-bordered border-dark">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                @*<th>Action</th>*@
+            </tr>
+        </thead>
+        <tbody id="lineItemsBody">
+            @for (int i = 0; i < Model.PurchaseItems.Count; i++)
+            {
+                <tr>
+                    <td>
+                        @*@Html.DropDownListFor(model => model.SaleItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })*@
+                        @*<span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>*@
+                        @Html.DisplayFor(model=> model.PurchaseItems[i].product.name)
+                    </td>
+                    <td>
+                        @*<input asp-for="SaleItems[i].quantity" class="form-control" />*@
+                        @*<span asp-validation-for="SaleItems[i].quantity" class="text-danger"></span>*@
+                        @Html.DisplayFor(model=> model.PurchaseItems[i].quantity)
+                    </td>
+                    <td>
+                        @*<input asp-for="SaleItems[i].price" class="form-control" />*@
+                        @*<span asp-validation-for="SaleItems[i].price" class="text-danger"></span>*@
+                        @Html.DisplayFor(model=> model.PurchaseItems[i].price)
+                    </td>
+                    @*<td>
+                <button type="button" class="btn btn-danger removeLineItem">Remove</button>
+                </td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<div>
+    <a asp-action="Edit" asp-route-id="@Model?.PurchaseOrder.purchase_id">Edit</a> |
     <a asp-action="Index">Back to List</a>
 </div>

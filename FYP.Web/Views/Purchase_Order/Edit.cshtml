@@ -1,4 +1,4 @@
-﻿@model FYP.DB.DBTables.Purchase_Order
+﻿@model FYP.DB.ViewModels.PurchaseViewModel
 
 @{
     ViewData["Title"] = "Edit";
@@ -12,36 +12,36 @@
     <div class="col-md-4">
         <form asp-action="Edit">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="purchase_id" />
+            <input type="hidden" asp-for="PurchaseOrder.purchase_id" />
             <div class="form-group">
-                <label asp-for="vendor_id" class="control-label"></label>
-                <select asp-for="vendor_id" class="form-control" asp-items="ViewBag.vendor_id"></select>
-                <span asp-validation-for="vendor_id" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.vendor_id" class="control-label"></label>
+                <select asp-for="PurchaseOrder.vendor_id" class="form-control" asp-items="ViewBag.vendor_id"></select>
+                <span asp-validation-for="PurchaseOrder.vendor_id" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="doc_name" class="control-label"></label>
-                <input asp-for="doc_name" class="form-control" />
-                <span asp-validation-for="doc_name" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.doc_name" class="control-label"></label>
+                <input asp-for="PurchaseOrder.doc_name" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.doc_name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="cost" class="control-label"></label>
-                <input asp-for="cost" class="form-control" />
-                <span asp-validation-for="cost" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.cost" class="control-label"></label>
+                <input asp-for="PurchaseOrder.cost" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.cost" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="create_date" class="control-label"></label>
-                <input asp-for="create_date" class="form-control" />
-                <span asp-validation-for="create_date" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.create_date" class="control-label"></label>
+                <input asp-for="PurchaseOrder.create_date" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.create_date" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="state" class="control-label"></label>
-                <input asp-for="state" class="form-control" />
-                <span asp-validation-for="state" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.state" class="control-label"></label>
+                <input asp-for="PurchaseOrder.state" class="form-control" />
+                <span asp-validation-for="PurchaseOrder.state" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="payment_method" class="control-label"></label>
-                <select asp-for="payment_method" class="form-control" asp-items="ViewBag.payment_method"></select>
-                <span asp-validation-for="payment_method" class="text-danger"></span>
+                <label asp-for="PurchaseOrder.payment_method" class="control-label"></label>
+                <select asp-for="PurchaseOrder.payment_method" class="form-control" asp-items="ViewBag.payment_method"></select>
+                <span asp-validation-for="PurchaseOrder.payment_method" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
@@ -55,5 +55,37 @@
 </div>
 
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    <script>
+        $(document).ready(function () {
+            var index = @Model.PurchaseItems.Count;
+
+            $('#addLineItem').click(function () {
+                var newRow = '<tr>' +
+                    '<td><select class="form-control" name="PurchaseItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
+                    '<td><input class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
+                    '<td><input class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
+                    '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
+                    '</tr>';
+
+                $('#lineItemsBody').append(newRow);
+
+                var select = $('select[name="PurchaseItems[' + index + '].product_id"]');
+                $.get('@Url.Action("GetProducts", "Products")', function (data) {
+                    select.empty();
+                    $.each(data, function (index, item) {
+                        select.append($('<option></option>').val(item.value).text(item.text));
+                    });
+                });
+
+                index++;
+            });
+
+            $(document).on('click', '.removeLineItem', function () {
+                $(this).closest('tr').remove();
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
