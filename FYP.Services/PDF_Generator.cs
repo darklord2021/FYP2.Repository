@@ -5,7 +5,7 @@ namespace FYP.Services
 {
     public class PDF_Generator
     {
-        public byte[] GetHTMLPageAsPDF(long id,string data)
+        public byte[] GetHTMLPageAsPDF(string data)
         {
             var Renderer = new IronPdf.ChromePdfRenderer();
             // Create a PDF Document
@@ -24,7 +24,7 @@ namespace FYP.Services
             };
             Renderer.RenderingOptions.MarginTop = 25; //mm
 
-            using var PDF = Renderer.RenderHtmlAsPdf("<h1>Hello IronPdf and MVC</h1>");
+            using var PDF = Renderer.RenderHtmlAsPdf(data);
 
             return PDF.BinaryData;
         }

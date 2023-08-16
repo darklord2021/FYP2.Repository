@@ -28,9 +28,9 @@ namespace FYP.DB.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("account")
+                        .IsRequired()
                         .HasMaxLength(50)
-                        .IsUnicode(false)
-                        .HasColumnType("varchar(50)");
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<int>("account_id")
                         .HasColumnType("int");
@@ -43,7 +43,7 @@ namespace FYP.DB.Migrations
 
                     b.HasKey("ID");
 
-                    b.ToTable("Account_Journal", (string)null);
+                    b.ToTable("Account_Journal");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Account_Move", b =>
@@ -58,6 +58,7 @@ namespace FYP.DB.Migrations
                         .HasColumnType("date");
 
                     b.Property<string>("Doc_Name")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
@@ -83,8 +84,11 @@ namespace FYP.DB.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<bool>("paid")
-                        .HasColumnType("bit");
+                    b.Property<bool?>("paid")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValueSql("(CONVERT([bit],(0)))");
 
                     b.Property<string>("purchase_source_doc")
                         .HasMaxLength(50)
@@ -96,11 +100,31 @@ namespace FYP.DB.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("Source_Doc");
+                    b.HasIndex(new[] { "Source_Doc" }, "IX_Account_Move_Source_Doc");
 
-                    b.HasIndex("purchase_source_doc");
+                    b.HasIndex(new[] { "purchase_source_doc" }, "IX_Account_Move_purchase_source_doc");
 
-                    b.ToTable("Account_Move", (string)null);
+                    b.ToTable("Account_Move");
+                });
+
+            modelBuilder.Entity("FYP.DB.DBTables.Billing_Address", b =>
+                {
+                    b.Property<int>("id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Billing_Address1")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Billing_Address");
+
+                    b.Property<int>("customer_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("customer_id");
+
+                    b.ToTable("Billing_Address");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Category", b =>
@@ -121,8 +145,7 @@ namespace FYP.DB.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(50)");
 
-                    b.Property<DateTime?>("created_on")
-                        .IsRequired()
+                    b.Property<DateTime>("created_on")
                         .HasColumnType("date");
 
                     b.Property<DateTime?>("last_modified")
@@ -131,7 +154,7 @@ namespace FYP.DB.Migrations
                     b.HasKey("category_id")
                         .HasName("PK__category__D54EE9B4C97CD641");
 
-                    b.ToTable("Category", (string)null);
+                    b.ToTable("Category");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Customer", b =>
@@ -158,8 +181,7 @@ namespace FYP.DB.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<long?>("phone")
-                        .IsRequired()
+                    b.Property<long>("phone")
                         .HasColumnType("bigint");
 
                     b.Property<double?>("record")
@@ -193,7 +215,7 @@ namespace FYP.DB.Migrations
 
                     b.HasKey("ID");
 
-                    b.HasIndex("account_id");
+                    b.HasIndex(new[] { "account_id" }, "IX_Invoice_lines_account_id");
 
                     b.ToTable("Invoice_lines");
                 });
@@ -215,7 +237,7 @@ namespace FYP.DB.Migrations
                     b.HasKey("id")
                         .HasName("PK__payment__3213E83F24B9F395");
 
-                    b.ToTable("Payment", (string)null);
+                    b.ToTable("Payment");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Product", b =>
@@ -242,20 +264,22 @@ namespace FYP.DB.Migrations
                         .HasColumnType("varchar(50)");
 
                     b.Property<int?>("quantity")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("reorder_level")
                         .HasColumnType("int");
 
                     b.Property<decimal?>("unit_price")
+                        .IsRequired()
                         .HasColumnType("money");
 
                     b.HasKey("product_id")
                         .HasName("PK__product__47027DF5AED1C8E3");
 
-                    b.HasIndex("category_id");
+                    b.HasIndex(new[] { "category_id" }, "IX_Product_category_id");
 
-                    b.ToTable("Product", (string)null);
+                    b.ToTable("Product");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Purchase_Order", b =>
@@ -272,6 +296,7 @@ namespace FYP.DB.Migrations
                         .HasDefaultValueSql("((0.99))");
 
                     b.Property<DateTime?>("create_date")
+                        .IsRequired()
                         .HasColumnType("date");
 
                     b.Property<string>("doc_name")
@@ -297,14 +322,17 @@ namespace FYP.DB.Migrations
                     b.HasKey("purchase_id")
                         .HasName("PK__purchase__87071CB979BDBC6D");
 
-                    b.HasIndex("payment_method");
-
-                    b.HasIndex("vendor_id");
+                    b.HasIndex(new[] { "doc_name" }, "AK_Purchase_Order_doc_name")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "doc_name" }, "IX_Purchase_Order")
                         .IsUnique();
 
-                    b.ToTable("Purchase_Order", (string)null);
+                    b.HasIndex(new[] { "payment_method" }, "IX_Purchase_Order_payment_method");
+
+                    b.HasIndex(new[] { "vendor_id" }, "IX_Purchase_Order_vendor_id");
+
+                    b.ToTable("Purchase_Order");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Purchase_Order_Detail", b =>
@@ -316,23 +344,27 @@ namespace FYP.DB.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
 
                     b.Property<decimal?>("price")
+                        .IsRequired()
                         .HasColumnType("money");
 
                     b.Property<int?>("product_id")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("purchase_id")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.Property<int?>("quantity")
+                        .IsRequired()
                         .HasColumnType("int");
 
                     b.HasKey("ID")
                         .HasName("PK_purchase_order_details");
 
-                    b.HasIndex("product_id");
+                    b.HasIndex(new[] { "product_id" }, "IX_Purchase_Order_Details_product_id");
 
-                    b.HasIndex("purchase_id");
+                    b.HasIndex(new[] { "purchase_id" }, "IX_Purchase_Order_Details_purchase_id");
 
                     b.ToTable("Purchase_Order_Details");
                 });
@@ -361,9 +393,9 @@ namespace FYP.DB.Migrations
                     b.HasKey("id")
                         .HasName("PK__reviews__3213E83FCAF32842");
 
-                    b.HasIndex("customer_id");
+                    b.HasIndex(new[] { "customer_id" }, "IX_Reviews_customer_id");
 
-                    b.HasIndex("product_id");
+                    b.HasIndex(new[] { "product_id" }, "IX_Reviews_product_id");
 
                     b.ToTable("Reviews");
                 });
@@ -408,14 +440,17 @@ namespace FYP.DB.Migrations
                     b.HasKey("sale_id")
                         .HasName("PK__sale_ord__E1EB00B23F3E713F");
 
-                    b.HasIndex("customer_id");
-
-                    b.HasIndex("payment_method");
+                    b.HasIndex(new[] { "name" }, "AK_Sale_Order_name")
+                        .IsUnique();
 
                     b.HasIndex(new[] { "name" }, "IX_Sale_Order_1")
                         .IsUnique();
 
-                    b.ToTable("Sale_Order", (string)null);
+                    b.HasIndex(new[] { "customer_id" }, "IX_Sale_Order_customer_id");
+
+                    b.HasIndex(new[] { "payment_method" }, "IX_Sale_Order_payment_method");
+
+                    b.ToTable("Sale_Order");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Sale_Order_Detail", b =>
@@ -445,11 +480,31 @@ namespace FYP.DB.Migrations
                     b.HasKey("ID")
                         .HasName("PK_sale_order_details");
 
-                    b.HasIndex("product_id");
+                    b.HasIndex(new[] { "product_id" }, "IX_Sale_Order_Details_product_id");
 
-                    b.HasIndex("sale_id");
+                    b.HasIndex(new[] { "sale_id" }, "IX_Sale_Order_Details_sale_id");
 
                     b.ToTable("Sale_Order_Details");
+                });
+
+            modelBuilder.Entity("FYP.DB.DBTables.Shipping_Address", b =>
+                {
+                    b.Property<int>("id")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Shipping_Address1")
+                        .IsRequired()
+                        .HasColumnType("text")
+                        .HasColumnName("Shipping_Address");
+
+                    b.Property<int>("customer_id")
+                        .HasColumnType("int");
+
+                    b.HasKey("id");
+
+                    b.HasIndex("customer_id");
+
+                    b.ToTable("Shipping_Address");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Transfer", b =>
@@ -475,8 +530,7 @@ namespace FYP.DB.Migrations
                     b.Property<int?>("backorder_doc_id")
                         .HasColumnType("int");
 
-                    b.Property<DateTime?>("created_date")
-                        .IsRequired()
+                    b.Property<DateTime>("created_date")
                         .HasColumnType("date");
 
                     b.Property<string>("operation_type")
@@ -494,7 +548,7 @@ namespace FYP.DB.Migrations
                     b.HasKey("ID")
                         .HasName("PK__transfer__3214EC2768AF2B94");
 
-                    b.HasIndex("backorder_doc_id");
+                    b.HasIndex(new[] { "backorder_doc_id" }, "IX_Transfers_backorder_doc_id");
 
                     b.ToTable("Transfers");
                 });
@@ -507,29 +561,54 @@ namespace FYP.DB.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("id"));
 
-                    b.Property<int?>("demand")
-                        .IsRequired()
+                    b.Property<int>("demand")
                         .HasColumnType("int");
 
                     b.Property<int?>("done")
                         .HasColumnType("int");
 
-                    b.Property<int?>("product_id")
-                        .IsRequired()
+                    b.Property<int>("product_id")
                         .HasColumnType("int");
 
-                    b.Property<int?>("transfer_id")
-                        .IsRequired()
+                    b.Property<int>("transfer_id")
                         .HasColumnType("int");
 
                     b.HasKey("id")
                         .HasName("PK__transfer__3213E83FFF168FCA");
 
-                    b.HasIndex("product_id");
+                    b.HasIndex(new[] { "product_id" }, "IX_Transfer_Details_product_id");
 
-                    b.HasIndex("transfer_id");
+                    b.HasIndex(new[] { "transfer_id" }, "IX_Transfer_Details_transfer_id");
 
                     b.ToTable("Transfer_Details");
+                });
+
+            modelBuilder.Entity("FYP.DB.DBTables.User_Auth", b =>
+                {
+                    b.Property<int>("ID")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ID"));
+
+                    b.Property<string>("password")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
+
+                    b.Property<int>("role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("username")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .IsUnicode(false)
+                        .HasColumnType("varchar(50)");
+
+                    b.HasKey("ID");
+
+                    b.ToTable("User_Auth");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Vendor", b =>
@@ -541,7 +620,6 @@ namespace FYP.DB.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("vendor_id"));
 
                     b.Property<long?>("NTN")
-                        .HasMaxLength(13)
                         .HasColumnType("bigint");
 
                     b.Property<string>("email_address")
@@ -556,8 +634,7 @@ namespace FYP.DB.Migrations
                         .IsUnicode(false)
                         .HasColumnType("varchar(100)");
 
-                    b.Property<long?>("phone_number")
-                        .IsRequired()
+                    b.Property<long>("phone_number")
                         .HasColumnType("bigint");
 
                     b.Property<string>("vendor_address")
@@ -592,6 +669,17 @@ namespace FYP.DB.Migrations
                     b.Navigation("Source_DocNavigation");
 
                     b.Navigation("purchase_source_docNavigation");
+                });
+
+            modelBuilder.Entity("FYP.DB.DBTables.Billing_Address", b =>
+                {
+                    b.HasOne("FYP.DB.DBTables.Customer", "customer")
+                        .WithMany("Billing_Addresses")
+                        .HasForeignKey("customer_id")
+                        .IsRequired()
+                        .HasConstraintName("FK_Billing Address_Customers");
+
+                    b.Navigation("customer");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Invoice_line", b =>
@@ -640,12 +728,15 @@ namespace FYP.DB.Migrations
                     b.HasOne("FYP.DB.DBTables.Product", "product")
                         .WithMany("Purchase_Order_Details")
                         .HasForeignKey("product_id")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK_purchase_order_details_product");
 
                     b.HasOne("FYP.DB.DBTables.Purchase_Order", "purchase")
                         .WithMany("Purchase_Order_Details")
                         .HasForeignKey("purchase_id")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
                         .HasConstraintName("FK_purchase_order_details_purchase_order");
 
                     b.Navigation("product");
@@ -709,6 +800,17 @@ namespace FYP.DB.Migrations
                     b.Navigation("sale");
                 });
 
+            modelBuilder.Entity("FYP.DB.DBTables.Shipping_Address", b =>
+                {
+                    b.HasOne("FYP.DB.DBTables.Customer", "customer")
+                        .WithMany("Shipping_Addresses")
+                        .HasForeignKey("customer_id")
+                        .IsRequired()
+                        .HasConstraintName("FK_Shipping_Address_Customers");
+
+                    b.Navigation("customer");
+                });
+
             modelBuilder.Entity("FYP.DB.DBTables.Transfer", b =>
                 {
                     b.HasOne("FYP.DB.DBTables.Transfer", "backorder_doc")
@@ -752,9 +854,13 @@ namespace FYP.DB.Migrations
 
             modelBuilder.Entity("FYP.DB.DBTables.Customer", b =>
                 {
+                    b.Navigation("Billing_Addresses");
+
                     b.Navigation("Reviews");
 
                     b.Navigation("Sale_Orders");
+
+                    b.Navigation("Shipping_Addresses");
                 });
 
             modelBuilder.Entity("FYP.DB.DBTables.Payment", b =>

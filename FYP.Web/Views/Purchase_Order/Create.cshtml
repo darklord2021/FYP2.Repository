@@ -1,16 +1,21 @@
-﻿@model FYP.DB.ViewModels.PurchaseViewModel
+﻿@using Microsoft.EntityFrameworkCore.Metadata.Internal;
+@model FYP.DB.ViewModels.PurchaseViewModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Create Purchase Order";
 }
 
 <h1>Create</h1>
 
 <h4>Purchase_Order</h4>
 <hr />
+@using (Html.BeginForm("Create", "Purchase_Order", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
+
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        @*<form asp-action="Create">*@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="PurchaseOrder.vendor_id" class="control-label"></label>
@@ -33,7 +38,7 @@
             <div class="form-group">
                 <input type="submit" value="Create" class="btn btn-primary" />
             </div>
-        </form>
+        @*</form>*@
     </div>
 </div>
 
@@ -81,7 +86,7 @@
         </tbody>
     </table>
 </div>
-
+}
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
@@ -98,8 +103,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="PurchaseItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
-                    '<td><input class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 

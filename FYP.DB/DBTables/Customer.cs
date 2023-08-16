@@ -1,32 +1,53 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
 
 public partial class Customer
 {
+    [Key]
     public int customer_id { get; set; }
-    [Required]
-    [Display(Name = "Name")]
-    public string? customer_name { get; set; }
-    [Required]
-    [Display(Name = "Email")]
-    [RegularExpression(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$", ErrorMessage = "Please enter a valid email address.")]
-    [DataType(DataType.EmailAddress)]
-    public string? email { get; set; }
-    [Required]
-    [Display(Name = "Phone")]
-    [Range(1000000000, 999999999999999999, ErrorMessage = "Please enter a valid phone number.")]
-    public long? phone { get; set; }
-    [Required]
-    [Display(Name = "Address")]
+
+    [Required(ErrorMessage = "The Customer Name field is required.")]
+    [StringLength(50)]
+    [Display(Name = "Customer Name")]
+    [Unicode(false)]
+    public string customer_name { get; set; } = null!;
+
+    [Required(ErrorMessage = "The Email field is required.")]
+    [StringLength(100)]
+    [EmailAddress(ErrorMessage = "Invalid email address.")]
+    [Display(Name = "Email Address")]
+    [Unicode(false)]
+    public string email { get; set; } = null!;
+
+    [Required(ErrorMessage = "The Phone field is required.")]
+    [RegularExpression(@"^\d{11,13}$", ErrorMessage = "Invalid phone number. It must be 11 to 13 digits.")]
+    [Display(Name = "Phone Number")]
+    public long phone { get; set; }
+
+    [Required(ErrorMessage = "The Address field is required.")]
+    [Column(TypeName = "text")]
     [DataType(DataType.MultilineText)]
-    public string? address { get; set; }
-    [Display(Name = "Rating")]
+    [Display(Name = "Address")]
+    public string address { get; set; } = null!;
+
+    [Range(0, double.MaxValue, ErrorMessage = "Record must be a non-negative number.")]
+    [Display(Name = "Record")]
     public double? record { get; set; }
 
+    [InverseProperty("customer")]
+    public virtual ICollection<Billing_Address> Billing_Addresses { get; set; } = new List<Billing_Address>();
+
+    [InverseProperty("customer")]
     public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
 
+    [InverseProperty("customer")]
     public virtual ICollection<Sale_Order> Sale_Orders { get; set; } = new List<Sale_Order>();
+
+    [InverseProperty("customer")]
+    public virtual ICollection<Shipping_Address> Shipping_Addresses { get; set; } = new List<Shipping_Address>();
 }

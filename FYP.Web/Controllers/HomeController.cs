@@ -2,9 +2,13 @@
 using FYP.Web.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
+
 
 namespace FYP.Web.Controllers
 {
+    [Authorize(Roles ="Admin,Sale,Purchase,Inventory,Finance")]
+    
     public class HomeController : Controller
     {
 
@@ -15,7 +19,7 @@ namespace FYP.Web.Controllers
             _context = context;
             _logger = logger;
         }
-
+        
         public IActionResult Index()
         {
             int totalSales = _context.Sale_Orders.Count(s => s.state == "Sale Order");

@@ -2,12 +2,12 @@
 @model FYP.DB.ViewModels.SalesViewModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Sale Order";
 }
 
 <h1>Edit</h1>
 
-<h4>Sale_Order</h4>
+<h4>Sale Order @Html.DisplayFor(model => model.SaleOrder.name)</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -21,7 +21,7 @@
             </div>
             <div class="form-group">
                 <label asp-for="SaleOrder.name" class="control-label"></label>
-                <input asp-for="SaleOrder.name" class="form-control" />
+                <input type="text" asp-for="SaleOrder.name" class="form-control" />
                 <span asp-validation-for="SaleOrder.name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -78,11 +78,11 @@
                         <span asp-validation-for="SaleItems[i].product_id" class="text-danger"></span>
                     </td>
                     <td>
-                        <input asp-for="SaleItems[i].quantity" class="form-control" />
+                        <input type="number" asp-for="SaleItems[i].quantity" class="form-control" />
                         <span asp-validation-for="SaleItems[i].quantity" class="text-danger"></span>
                     </td>
                     <td>
-                        <input asp-for="SaleItems[i].price" class="form-control" />
+                        <input type="number" asp-for="SaleItems[i].price" class="form-control" />
                         <span asp-validation-for="SaleItems[i].price" class="text-danger"></span>
                     </td>
                     <td>
@@ -110,8 +110,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="SaleItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
-                    '<td><input class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].price" /></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 

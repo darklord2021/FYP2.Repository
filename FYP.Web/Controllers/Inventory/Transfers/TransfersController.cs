@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
 using FYP.DB.ViewModels;
+using FYP.Web.DBTables;
 
 namespace FYP.Web.Controllers.Inventory.Transfers
 {
@@ -25,18 +26,39 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         public async Task<IActionResult> Index()
         {
             var fYPContext = _context.Transfers.Include(t => t.backorder_doc);
-            return View(await fYPContext.ToListAsync());
+            if (fYPContext is not null)
+            {
+                return View(await fYPContext.ToListAsync());
+            }
+            else
+            {
+                return View();
+            }
         }
 
         public async Task<IActionResult> GRNIndex()
         {
             var fYPContext = _context.Transfers.Include(t => t.backorder_doc).Where(t=>t.Doc_name.Contains("WH-IN"));
-            return View(await fYPContext.ToListAsync());
+            if (fYPContext is not null)
+            {
+                return View(await fYPContext.ToListAsync());
+            }
+            else
+            {
+                return View();
+            }
         }
         public async Task<IActionResult> DNIndex()
         {
             var fYPContext = _context.Transfers.Include(t => t.backorder_doc).Where(t => t.Doc_name.Contains("WH-OUT"));
-            return View(await fYPContext.ToListAsync());
+            if (fYPContext is not null)
+            {
+                return View(await fYPContext.ToListAsync());
+            }
+            else
+            {
+                return View();
+            }
         }
 
         // GET: Transfers/Details/5
@@ -92,15 +114,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(TransferViewModel viewModel)
         {
-            ////if (ModelState.IsValid)
-            ////{
-            //    _context.Add(transfer);
-            //    await _context.SaveChangesAsync();
-            //    return RedirectToAction(nameof(Index));
-            ////}
-            //ViewData["backorder_doc_id"] = new SelectList(_context.Transfers, "ID", "status", transfer.backorder_doc_id);
-            //return View(transfer);
-
+           
 
             _context.Transfers.Add(viewModel.Transfer);
             _context.SaveChanges();
@@ -133,18 +147,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         // GET: Transfers/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            //if (id == null || _context.Transfers == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //var transfer = await _context.Transfers.FindAsync(id);
-            //if (transfer == null)
-            //{
-            //    return NotFound();
-            //}
-            //ViewData["backorder_doc_id"] = new SelectList(_context.Transfers, "ID", "status", transfer.backorder_doc_id);
-            //return View(transfer);
+            
 
             if (id == null || _context.Transfers== null)
             {
@@ -152,6 +155,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             }
 
             var transfer = await _context.Transfers
+                .Include(s=>s.Transfer_Details)
                             //.Include(s => s.customer)
                             //.Include(s => s.payment_methodNavigation)
                             .FirstOrDefaultAsync(m => m.ID == id);
@@ -183,34 +187,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         //public async Task<IActionResult> Edit(int id, [Bind("ID,Doc_name,Source_Document,created_date,backorder_doc_id,status")] Transfer transfer)
         public async Task<IActionResult> Edit(int id, TransferViewModel viewModel)
         {
-            //if (id != transfer.ID)
-            //{
-            //    return NotFound();
-            //}
-
-            ////if (ModelState.IsValid)
-            ////{
-            //    try
-            //    {
-            //        _context.Update(transfer);
-            //        await _context.SaveChangesAsync();
-            //    }
-            //    catch (DbUpdateConcurrencyException)
-            //    {
-            //        if (!TransferExists(transfer.ID))
-            //        {
-            //            return NotFound();
-            //        }
-            //        else
-            //        {
-            //            throw;
-            //        }
-            //    }
-            //    return RedirectToAction(nameof(Index));
-            ////}
-            //ViewData["backorder_doc_id"] = new SelectList(_context.Transfers, "ID", "status", transfer.backorder_doc_id);
-            //return View(transfer);
-
+            
             if (id != viewModel.Transfer.ID)
             {
                 return NotFound();
@@ -220,9 +197,82 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             //{
             try
             {
+                var originalTransfer = await _context.Transfers
+                .AsNoTracking()
+                .FirstOrDefaultAsync(m => m.ID == id);
+
+                if (originalTransfer == null)
+                {
+                    return NotFound();
+                }
+
+                // Set the operation_type from the original entity to the modified entity
+                viewModel.Transfer.operation_type = originalTransfer.operation_type;
+                //viewModel.Transfer.operation_type
+                //_context.Update(viewModel.Transfer);
+                //await _context.SaveChangesAsync();
+                //_context.Update(viewModel.LineItems);
+                //await _context.SaveChangesAsync();
+
+                // Update header items
                 _context.Update(viewModel.Transfer);
-                await _context.SaveChangesAsync();
-                _context.Update(viewModel.LineItems);
+
+                // Delete existing line items that are removed in the view
+                var existingLineItems = await _context.Transfer_Details
+                    .Where(d => d.transfer_id == id)
+                    .ToListAsync();
+                if (viewModel.LineItems == null)
+                {
+                    viewModel.LineItems = new List<FYP.DB.DBTables.Transfer_Detail>(); // Initialize the LineItems collection if it's null
+                }
+                foreach (var existingItem in existingLineItems)
+                {
+                    //if(existingItem is not null) { 
+                    //if (!viewModel.LineItems.Any(li => li.transfer_id == id))
+                    //{
+                    //    _context.Transfer_Details.Remove(existingItem);
+                    //}
+                    //}
+                    var updatedItem = viewModel.LineItems.FirstOrDefault(li => li.transfer_id == existingItem.transfer_id);
+
+                    if (updatedItem != null)
+                    {
+                        existingItem.demand = updatedItem.demand; // Update the quantity
+                        existingItem.done = updatedItem.done;
+                    }
+                    else
+                    {
+                        _context.Transfer_Details.Remove(existingItem);
+                    }
+                }
+
+                // Add or update line items
+                if ( viewModel.LineItems.Count != 0) { 
+                foreach (var lineItem in viewModel.LineItems)
+                {
+                    if (lineItem.transfer_id == 0 || lineItem.transfer_id == null) // New line item, not in the database
+                    {
+                        _context.Transfer_Details.Add(lineItem);
+                    }
+                    else // Existing line item, update it
+                    {
+                        _context.Update(lineItem);
+                    }
+                }
+                }
+                else
+                {
+                    foreach (var lineItem in viewModel.LineItems)
+                    {
+                        if (lineItem.transfer_id == 0) // New line item, not in the database
+                        {
+                            lineItem.transfer_id = id;
+                            _context.Transfer_Details.Add(lineItem);
+                        }
+                    }
+                        //_context.Transfer_Details.Add(lineItem);
+                }
+
                 await _context.SaveChangesAsync();
 
             }
@@ -314,6 +364,28 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         //    }
         //}
 
+
+
+        //private bool CheckAvailability(int id)
+        //{
+        //    var transfer = _context.Transfers
+        //        .Include(t => t.Transfer_Details)
+        //        .FirstOrDefault(t => t.ID == id);
+
+        //    foreach (var item in transfer.Transfer_Details)
+        //    {
+        //        var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
+
+        //        if (item.demand >= product.quantity)
+        //        {
+        //            // Exclude the quantity that doesn't satisfy the availability condition
+        //            item.demand = product.quantity - 1;
+        //        }
+        //    }
+
+        //    return true;
+        //}
+
         private bool CheckAvailability(int id)
         {
             var transfer = _context.Transfers
@@ -324,22 +396,87 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             {
                 var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
 
-                if (item.demand >= product.quantity)
+                if (item.demand > product.quantity)
                 {
-                    // Exclude the quantity that doesn't satisfy the availability condition
-                    item.demand = product.quantity - 1;
+                    // Set a message to display which product has insufficient quantity
+                    TempData["SalePopupMessage"] = $"Product '{product.name}' does not have sufficient quantity.";
+                    return false;
                 }
             }
 
-            return true;
+            return true; // All products have sufficient quantity
         }
 
 
+        //[HttpGet]
+        ////[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Validate(int id)
+        //{
+        //    // Find the sale order by ID
+        //    var transfer = await _context.Transfers
+        //        .Include(tr => tr.Transfer_Details)
+        //        .FirstOrDefaultAsync(tr => tr.ID == id);
+
+        //    if (transfer == null)
+        //    {
+        //        return NotFound();
+        //    }
+
+        //    // Check if the sale order is already confirmed
+        //    if (transfer.status == "Done")
+        //    {
+        //        //return BadRequest("Sale order is already confirmed.");
+        //        TempData["SalePopupMessage"] = "Transfer is already validated.";
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    if (!CheckAvailability(id))
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+
+        //    // Update the state to "Done"
+        //    transfer.status = "Done";
+        //    _context.Update(transfer);
+        //    await _context.SaveChangesAsync();
+        //    int count = 0;
+
+
+        //    // Add details to the transfer detail table
+        //    foreach (var item in transfer.Transfer_Details)
+        //    {
+        //        var transferDetail = new Transfer_Detail
+        //        {
+        //            transfer_id = transfer.ID,
+        //            product_id = item.product_id,
+        //            demand = item.demand,
+        //            done = 0
+        //        };
+        //        Product pq = _context.Products.Find(transferDetail.product_id);
+        //        //check availability
+        //        if (transferDetail.demand > pq.quantity)
+        //        {
+        //            count++;
+        //        }
+
+
+        //    }
+        //    if (count > 0)
+        //    {
+        //        await _context.SaveChangesAsync();
+        //        TempData["SalePopupMessage"] = "cannot Validate.";
+
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //    else
+        //    {
+        //        return RedirectToAction(nameof(Index));
+        //    }
+        //}
+
         [HttpGet]
-        //[ValidateAntiForgeryToken]
         public async Task<IActionResult> Validate(int id)
         {
-            // Find the sale order by ID
             var transfer = await _context.Transfers
                 .Include(tr => tr.Transfer_Details)
                 .FirstOrDefaultAsync(tr => tr.ID == id);
@@ -349,52 +486,87 @@ namespace FYP.Web.Controllers.Inventory.Transfers
                 return NotFound();
             }
 
-            // Check if the sale order is already confirmed
+            // Check if the transfer is already confirmed
             if (transfer.status == "Done")
             {
-                //return BadRequest("Sale order is already confirmed.");
                 TempData["SalePopupMessage"] = "Transfer is already validated.";
                 return RedirectToAction(nameof(Index));
             }
 
-            // Update the state to "Sale"
+            // Check availability before confirming the transfer
+            List<FYP.DB.DBTables.Product> insufficientProducts;
+            if (!CheckAvailability(id, out insufficientProducts))
+            {
+                TempData["InsufficientProducts"] = insufficientProducts;
+                TempData["TransferId"] = id;
+                return RedirectToAction(nameof(CreateBackorder));
+            }
+
+            // Update the stock based on the operation type (sale or purchase)
+            foreach (var item in transfer.Transfer_Details)
+            {
+                var product = _context.Products.FirstOrDefault(p => p.product_id == item.product_id);
+                if (product != null)
+                {
+                    if (transfer.operation_type == "DN")
+                    {
+                        product.quantity -= item.demand; // Reduce stock for sale
+                    }
+                    else if (transfer.operation_type == "GRN")
+                    {
+                        product.quantity += item.demand; // Increase stock for purchase
+                    }
+                }
+            }
+
+            // Update the status to "Done" and save changes
+            
             transfer.status = "Done";
             _context.Update(transfer);
             await _context.SaveChangesAsync();
-            int count = 0;
 
+            return RedirectToAction(nameof(Index));
+        }
 
-            // Add details to the transfer detail table
+        private bool CheckAvailability(int id, out List<FYP.DB.DBTables.Product> insufficientProducts)
+        {
+            var transfer = _context.Transfers
+                .Include(t => t.Transfer_Details)
+                .FirstOrDefault(t => t.ID == id);
+
+            insufficientProducts = new List<FYP.DB.DBTables.Product>();
+
             foreach (var item in transfer.Transfer_Details)
             {
-                var transferDetail = new Transfer_Detail
+                var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
+
+                if (item.demand > product.quantity)
                 {
-                    transfer_id = transfer.ID,
-                    product_id = item.product_id,
-                    demand = item.demand,
-                    done = 0
-                };
-                Product pq = _context.Products.Find(transferDetail.product_id);
-                //check availability
-                if (transferDetail.demand > pq.quantity)
-                {
-                    count++;
+                    insufficientProducts.Add(product);
                 }
-
-
             }
-            if (count > 0)
-            {
-                await _context.SaveChangesAsync();
-                TempData["SalePopupMessage"] = "cannot Validate.";
 
-                return RedirectToAction(nameof(Index));
-            }
-            else
-            {
-                return RedirectToAction(nameof(Index));
-            }
+            return insufficientProducts.Count == 0; // All products have sufficient quantity
         }
+
+        [HttpGet]
+        public IActionResult CreateBackorder()
+        {
+            var insufficientProducts = TempData["InsufficientProducts"] as List<FYP.DB.DBTables.Product>;
+            var transferId = (int)TempData["TransferId"];
+
+            if (insufficientProducts == null || insufficientProducts.Count == 0)
+            {
+                // If the user accessed the CreateBackorder action directly without going through the Validate action,
+                // redirect to the Transfer Index.
+                return RedirectToAction(nameof(Index));
+            }
+
+            ViewBag.TransferId = transferId;
+            ViewBag.InsufficientProducts = insufficientProducts;
+            return View();
+        }
+
 
     }
 }

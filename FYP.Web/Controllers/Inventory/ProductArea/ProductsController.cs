@@ -7,19 +7,27 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Inventory.ProductArea
 {
+    [Authorize(Roles = "Admin,Inventory")]
     public class ProductsController : Controller
     {
+        private readonly ILogger<ProductsController> _logger;
         private readonly FYPContext _context;
 
-        public ProductsController(FYPContext context)
+        public ProductsController(ILogger<ProductsController> logger,FYPContext context)
         {
+            _logger=logger;
             _context = context;
         }
 
         // GET: Products
+        [Authorize(Roles ="Admin,Inventory" +
+            "" +
+            "" +
+            "")]
         public async Task<IActionResult> Index()
         {
             var fYPContext = _context.Products.Include(p => p.category);

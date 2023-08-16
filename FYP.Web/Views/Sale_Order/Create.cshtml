@@ -105,7 +105,9 @@
 
 @using Microsoft.EntityFrameworkCore.Metadata.Internal;
 @model FYP.DB.ViewModels.SalesViewModel
-
+@{
+    ViewData["Title"] = "Create Sale Order";
+}
 @using (Html.BeginForm("Create", "Sale_Order", FormMethod.Post))
 {
     @Html.AntiForgeryToken()
@@ -113,11 +115,7 @@
     <div>
         <h4>Sale Order Information</h4>
         <div class="row"></div>
-        <div class="form-group">
-            <label asp-for="SaleOrder.name" class="control-label"></label>
-            <input asp-for="SaleOrder.name" class="form-control" />
-            <span asp-validation-for="SaleOrder.name" class="text-danger"></span>
-        </div>
+        <h5>New</h5>
 
         <div class="form-group">
             <label asp-for="SaleOrder.customer_id" class="control-label"></label>
@@ -191,8 +189,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="SaleItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
-                    '<td><input class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].price" /></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 

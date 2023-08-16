@@ -5,12 +5,15 @@
 }
 
 <h1>Edit</h1>
+@using (Html.BeginForm("Edit", "Purchase_Order", FormMethod.Post))
+{
+    @Html.AntiForgeryToken()
 
 <h4>Purchase_Order</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Edit">
+        @*<form asp-action="Edit">*@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="PurchaseOrder.purchase_id" />
             <div class="form-group">
@@ -46,10 +49,54 @@
             <div class="form-group">
                 <input type="submit" value="Save" class="btn btn-primary" />
             </div>
-        </form>
+        @*</form>*@
     </div>
 </div>
-
+    <div class="row">
+        <div class="col-9">
+            <h4>Line Items</h4>
+        </div>
+        <div class="col-3 text-right">
+            <button type="button" id="addLineItem" class="btn btn-primary">Add Line Item</button>
+        </div>
+    </div>
+    <br>
+<div class="row">
+    <table class="table table-bordered border-dark">
+        <thead>
+            <tr>
+                <th>Product Name</th>
+                <th>Quantity</th>
+                <th>Price</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody id="lineItemsBody">
+            @for (int i = 0; i < Model.PurchaseItems.Count; i++)
+            {
+                <tr>
+                        <input type="hidden" asp-for="PurchaseItems[i].ID" class="form-control" />
+                    <td>
+                        @Html.DropDownListFor(model => model.PurchaseItems[i].product_id, (SelectList)ViewData["product_id"], "Select a Product", new { @class = "form-control" })
+                        <span asp-validation-for="PurchaseItems[i].product_id" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="PurchaseItems[i].quantity" class="form-control" />
+                        <span asp-validation-for="PurchaseItems[i].quantity" class="text-danger"></span>
+                    </td>
+                    <td>
+                        <input asp-for="PurchaseItems[i].price" class="form-control" />
+                        <span asp-validation-for="PurchaseItems[i].price" class="text-danger"></span>
+                    </td>
+                    <td>
+                            <button type="button" class="btn btn-danger removeLineItem" data-id="@Model.PurchaseItems[i].ID">Remove</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+}
 <div>
     <a asp-action="Index">Back to List</a>
 </div>
@@ -62,8 +109,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="PurchaseItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
-                    '<td><input class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 
@@ -80,9 +127,31 @@
                 index++;
             });
 
+            //$(document).on('click', '.removeLineItem', function () {
+            //    $(this).closest('tr').remove();
+            //});
+
             $(document).on('click', '.removeLineItem', function () {
-                $(this).closest('tr').remove();
+                var itemId = $(this).data('id');
+                var row = $(this).closest('tr');
+
+                // Send AJAX request to remove the line item
+                $.ajax({
+                    url: '@Url.Action("DeleteConfirmed", "Purchase_Order_Detail")/'+itemId,
+                    type: 'POST',
+                    data: { id: itemId },
+                    success: function () {
+                        // Remove the row from the UI
+                        row.remove();
+                    },
+                    error: function (xhr, status, error) {
+                        console.log(error);
+                        // Handle error if needed
+                    }
+                });
             });
+
+
         });
     </script>
     @{
