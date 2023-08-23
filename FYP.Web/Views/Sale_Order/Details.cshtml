@@ -5,10 +5,14 @@
     ViewData["Title"] = "Details";
 }
 
-<h1>Details</h1>
+@*<h1></h1>*@
 
 <div>
-    <h4>Sale_Order</h4>
+    <h4>Sale Order Details</h4>
+    <header class="row">
+        <div class="col"><a asp-action="index" asp-controller="Sale_Order" class="btn btn-primary">Sale Orders</a></div>
+        <div class="col"><a asp-action="generatepdf" target="_blank" asp-controller="Sale_Order" asp-route-id="@Model.SaleOrder.sale_id" class="btn btn-info">Print Document</a></div>
+    </header>
     <hr />
     <dl class="row">
         <dt class = "col-sm-2">

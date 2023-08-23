@@ -10,6 +10,6 @@ namespace FYP.DB.ViewModels
     public class Account_MoveViewModel
     {
         public Account_Move Account { get; set; }
-        public List<Invoice_line> Invoice_Details { get; set; }
+        public List<Invoice_line>? Invoice_Details { get; set; }
     }
 }

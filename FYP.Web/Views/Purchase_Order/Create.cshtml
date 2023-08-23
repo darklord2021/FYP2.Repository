@@ -5,9 +5,9 @@
     ViewData["Title"] = "Create Purchase Order";
 }
 
-<h1>Create</h1>
+@*<h1></h1>*@
 
-<h4>Purchase_Order</h4>
+<h4>Create New Purchase Order</h4>
 <hr />
 @using (Html.BeginForm("Create", "Purchase_Order", FormMethod.Post))
 {
@@ -21,11 +21,11 @@
                 <label asp-for="PurchaseOrder.vendor_id" class="control-label"></label>
                 <select asp-for="PurchaseOrder.vendor_id" class="form-control" asp-items="ViewBag.vendor_id"></select>
             </div>
-            <div class="form-group">
+            @*<div class="form-group">
                 <label asp-for="PurchaseOrder.doc_name" class="control-label"></label>
                 <input asp-for="PurchaseOrder.doc_name" class="form-control" />
                 <span asp-validation-for="PurchaseOrder.doc_name" class="text-danger"></span>
-            </div>
+            </div>*@
             <div class="form-group">
                 <label asp-for="PurchaseOrder.create_date" class="control-label"></label>
                 <input asp-for="PurchaseOrder.create_date" class="form-control" />

@@ -9,7 +9,6 @@ using FYP.DB.Context;
 using FYP.DB.DBTables;
 using FYP.DB.ViewModels;
 using FYP.Services;
-using FYP.Web.DBTables;
 using FYP.Web.Models;
 
 namespace FYP.Web.Controllers.Sales
@@ -92,7 +91,27 @@ namespace FYP.Web.Controllers.Sales
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SalesViewModel viewModel)
         {
-            viewModel.SaleOrder.name = string.Format("S{0:D5}", _context.Sale_Orders.Count() + 1);
+            //viewModel.SaleOrder.name = string.Format("S{0:D5}", _context.Sale_Orders.Count() + 1);
+            string? maxExistingName = _context.Sale_Orders
+                                        .Select(so => so.name)
+                                        .OrderByDescending(name => name)
+                                        .FirstOrDefault();
+
+            // Extract the numeric part and increment it
+            int count = 0;
+            if (!string.IsNullOrEmpty(maxExistingName) && maxExistingName.Length >= 2)
+            {
+                if (int.TryParse(maxExistingName.Substring(1), out int numericPart))
+                {
+                    count = numericPart + 1;
+                }
+            }
+
+            // Generate the new name
+            string newUniqueName = string.Format("S{0:D5}", count);
+
+            // Set the new unique name
+            viewModel.SaleOrder.name = newUniqueName;
 
             // Save the sale order header to the database
             _context.Sale_Orders.Add(viewModel.SaleOrder);
@@ -189,10 +208,60 @@ namespace FYP.Web.Controllers.Sales
             //{
             try
             {
+                //if(viewModel.SaleItems is not null) 
+                //{ 
+                //var existingsaleItems = _context.Sale_Order_Details
+                //                .Where(item => item.sale_id == viewModel.SaleOrder.sale_id)
+                //                .ToList();
+                //foreach (var existingsaleItem in existingsaleItems)
+                //{
+                //    _context.Sale_Order_Details.Remove(existingsaleItem);
+                //}
+
+                //}
+                //_context.Update(viewModel.SaleOrder);
+                //await _context.SaveChangesAsync();
+                //_context.Update(viewModel.SaleItems);
+                //await _context.SaveChangesAsync();
+
+                var existingPurchaseItems = _context.Sale_Order_Details
+                                .Where(item => item.sale_id == viewModel.SaleOrder.sale_id)
+                                .ToList();
+                foreach (var existingPurchaseItem in existingPurchaseItems)
+                {
+                    _context.Sale_Order_Details.Remove(existingPurchaseItem);
+                }
+
                 _context.Update(viewModel.SaleOrder);
                 await _context.SaveChangesAsync();
-                _context.Update(viewModel.SaleItems);
-                await _context.SaveChangesAsync();
+
+                //foreach (var purchase in viewModel.PurchaseItems) 
+                //{
+                //            purchase.purchase_id = viewModel.PurchaseOrder.purchase_id;
+                //            purchase.ID = purchase.ID;
+                //            _context.Update(purchase);
+                //            _context.SaveChanges();
+                //}
+
+                if (viewModel.SaleItems is not null)
+                {
+                    foreach (var item in viewModel.SaleItems)
+                    {
+                        var lineItem = new DB.DBTables.Sale_Order_Detail
+                        {
+                            sale_id = viewModel.SaleOrder.sale_id,
+                            product_id = item.product_id,
+                            quantity = item.quantity,
+                            price = item.price
+                        };
+                        //if (lineItem.quantity < lineItem.product.quantity)
+                        //{
+                        _context.Sale_Order_Details.Add(lineItem);
+                        _context.SaveChanges();
+                        //}
+                    }
+                }
+
 
             }
             catch (DbUpdateConcurrencyException)
@@ -241,7 +310,7 @@ namespace FYP.Web.Controllers.Sales
         {
             if (_context.Sale_Orders == null)
             {
-                return Problem("Entity set 'FYPContext.Sale_Orders'  is null.");
+                return Problem("There's nothing in Sale Orders.");
             }
             var sale_Order = await _context.Sale_Orders.FindAsync(id);
             if (sale_Order != null)
@@ -391,9 +460,11 @@ namespace FYP.Web.Controllers.Sales
         }
 
 
-        public IActionResult GeneratePDF(int id)
+        public async Task<IActionResult> GeneratePDF(int id)
         {
-            var sale_Order =  _context.Sale_Orders.Find(id);
+            var sale_Order = await  _context.Sale_Orders
+                .Include(so=>so.customer)
+                .FirstOrDefaultAsync(so=>so.sale_id==id);
             string data = 
                 "<h1>"+sale_Order.name+"<h1/>"
                 +"<div class='row'>" +
@@ -410,7 +481,7 @@ namespace FYP.Web.Controllers.Sales
 
             // Set the response headers
             Response.Headers.Add("Content-Length", pdfBytes.Length.ToString());
-            Response.Headers.Add("Content-Disposition", "inline; filename=Document_" + id + ".pdf");
+            Response.Headers.Add("Content-Disposition", "inline; filename=Document_" + sale_Order.name + ".pdf");
 
             return File(pdfBytes, "application/pdf");
         }

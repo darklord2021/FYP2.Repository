@@ -10,6 +10,6 @@ namespace FYP.DB.ViewModels
     public class SalesViewModel
     {
         public Sale_Order SaleOrder { get; set; }
-        public List<Sale_Order_Detail> SaleItems { get; set; }
+        public List<Sale_Order_Detail>? SaleItems { get; set; }
     }
 }

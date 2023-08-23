@@ -7,10 +7,13 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace FYP.Web.Controllers.Inventory.Transfers
 {
-    public class Transfer_DetailController : Controller
+	[Authorize(Roles = "Admin,Inventory")]
+	public class Transfer_DetailController : Controller
     {
         private readonly FYPContext _context;
 

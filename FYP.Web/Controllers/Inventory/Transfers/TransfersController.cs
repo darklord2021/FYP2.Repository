@@ -8,10 +8,11 @@ using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
 using FYP.DB.ViewModels;
-using FYP.Web.DBTables;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Inventory.Transfers
 {
+    [Authorize(Roles ="Admin,Inventory")]
     public class TransfersController : Controller
     {
         private readonly FYPContext _context;
@@ -338,34 +339,6 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         }
 
 
-
-
-
-
-        //private bool checkavailability(int id)
-        //{
-        //    var transfer = _context.Transfers
-        //        .Include(t => t.Transfer_Details)
-        //        .FirstOrDefault(t => t.ID == id);
-        //    int tcount = 0;
-        //    foreach (var item in transfer.Transfer_Details)
-        //    {
-        //        var products = _context.Products.FirstOrDefault(a=> a.product_id == item.product_id);
-        //        var n = transfer.Transfer_Details;
-
-        //        if (item.demand < products.quantity)
-        //        {
-        //            available = true;
-        //        }
-        //        else
-        //        {
-        //            return true;
-        //        }
-        //    }
-        //}
-
-
-
         //private bool CheckAvailability(int id)
         //{
         //    var transfer = _context.Transfers
@@ -376,43 +349,21 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         //    {
         //        var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
 
-        //        if (item.demand >= product.quantity)
+        //        if (item.demand > product.quantity)
         //        {
-        //            // Exclude the quantity that doesn't satisfy the availability condition
-        //            item.demand = product.quantity - 1;
+        //            // Set a message to display which product has insufficient quantity
+        //            TempData["SalePopupMessage"] = $"Product '{product.name}' does not have sufficient quantity.";
+        //            return false;
         //        }
         //    }
 
-        //    return true;
+        //    return true; // All products have sufficient quantity
         //}
-
-        private bool CheckAvailability(int id)
-        {
-            var transfer = _context.Transfers
-                .Include(t => t.Transfer_Details)
-                .FirstOrDefault(t => t.ID == id);
-
-            foreach (var item in transfer.Transfer_Details)
-            {
-                var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
-
-                if (item.demand > product.quantity)
-                {
-                    // Set a message to display which product has insufficient quantity
-                    TempData["SalePopupMessage"] = $"Product '{product.name}' does not have sufficient quantity.";
-                    return false;
-                }
-            }
-
-            return true; // All products have sufficient quantity
-        }
-
+        //---------------------------------------------------------------------------------------------------------------------------------------
 
         //[HttpGet]
-        ////[ValidateAntiForgeryToken]
         //public async Task<IActionResult> Validate(int id)
         //{
-        //    // Find the sale order by ID
         //    var transfer = await _context.Transfers
         //        .Include(tr => tr.Transfer_Details)
         //        .FirstOrDefaultAsync(tr => tr.ID == id);
@@ -422,57 +373,73 @@ namespace FYP.Web.Controllers.Inventory.Transfers
         //        return NotFound();
         //    }
 
-        //    // Check if the sale order is already confirmed
+        //    // Check if the transfer is already confirmed
         //    if (transfer.status == "Done")
         //    {
-        //        //return BadRequest("Sale order is already confirmed.");
         //        TempData["SalePopupMessage"] = "Transfer is already validated.";
         //        return RedirectToAction(nameof(Index));
         //    }
 
-        //    if (!CheckAvailability(id))
+        //    // Check availability before confirming the transfer
+        //    List<FYP.DB.DBTables.Product> insufficientProducts;
+        //    if (!CheckAvailability(id, out insufficientProducts))
         //    {
-        //        return RedirectToAction(nameof(Index));
+        //        TempData["InsufficientProducts"] = insufficientProducts;
+        //        TempData["TransferId"] = id;
+        //        return RedirectToAction(nameof(CreateBackorder));
         //    }
 
-        //    // Update the state to "Done"
+        //    // Update the stock based on the operation type (sale or purchase)
+        //    foreach (var item in transfer.Transfer_Details)
+        //    {
+        //        var product = _context.Products.FirstOrDefault(p => p.product_id == item.product_id);
+        //        if (product != null)
+        //        {
+        //            if (transfer.operation_type == "DN")
+        //            {
+        //                if(CheckAvailability(item.id) == true) { 
+        //                product.quantity -= item.demand; // Reduce stock for sale
+        //                }
+        //            }
+        //            else if (transfer.operation_type == "GRN")
+        //            {
+        //                product.quantity += item.demand; // Increase stock for purchase
+        //            }
+        //        }
+        //    }
+
+        //    // Update the status to "Done" and save changes
+
         //    transfer.status = "Done";
         //    _context.Update(transfer);
         //    await _context.SaveChangesAsync();
-        //    int count = 0;
 
-
-        //    // Add details to the transfer detail table
-        //    foreach (var item in transfer.Transfer_Details)
-        //    {
-        //        var transferDetail = new Transfer_Detail
-        //        {
-        //            transfer_id = transfer.ID,
-        //            product_id = item.product_id,
-        //            demand = item.demand,
-        //            done = 0
-        //        };
-        //        Product pq = _context.Products.Find(transferDetail.product_id);
-        //        //check availability
-        //        if (transferDetail.demand > pq.quantity)
-        //        {
-        //            count++;
-        //        }
-
-
-        //    }
-        //    if (count > 0)
-        //    {
-        //        await _context.SaveChangesAsync();
-        //        TempData["SalePopupMessage"] = "cannot Validate.";
-
-        //        return RedirectToAction(nameof(Index));
-        //    }
-        //    else
-        //    {
-        //        return RedirectToAction(nameof(Index));
-        //    }
+        //    return RedirectToAction(nameof(Index));
         //}
+
+        private bool CheckAvailability(int id, out List<int> insufficientProductIds)
+        {
+            var transfer = _context.Transfers
+                .Include(t => t.Transfer_Details)
+                .FirstOrDefault(t => t.ID == id);
+
+            insufficientProductIds = new List<int>();
+
+            foreach (var item in transfer.Transfer_Details)
+            {
+                var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
+
+                if (item.demand > product.quantity)
+                {
+                    insufficientProductIds.Add(product.product_id);
+                    _context.SaveChanges();
+                }
+            }
+
+            return insufficientProductIds.Count == 0; // All products have sufficient quantity
+        }
+
+
 
         [HttpGet]
         public async Task<IActionResult> Validate(int id)
@@ -494,10 +461,10 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             }
 
             // Check availability before confirming the transfer
-            List<FYP.DB.DBTables.Product> insufficientProducts;
-            if (!CheckAvailability(id, out insufficientProducts))
+            List<int> insufficientProductIds;
+            if (!CheckAvailability(id, out insufficientProductIds))
             {
-                TempData["InsufficientProducts"] = insufficientProducts;
+                TempData["InsufficientProductIds"] = insufficientProductIds;
                 TempData["TransferId"] = id;
                 return RedirectToAction(nameof(CreateBackorder));
             }
@@ -508,7 +475,7 @@ namespace FYP.Web.Controllers.Inventory.Transfers
                 var product = _context.Products.FirstOrDefault(p => p.product_id == item.product_id);
                 if (product != null)
                 {
-                    if (transfer.operation_type == "DN")
+                    if (transfer.operation_type == "DN" && item.demand <= product.quantity)
                     {
                         product.quantity -= item.demand; // Reduce stock for sale
                     }
@@ -520,7 +487,6 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             }
 
             // Update the status to "Done" and save changes
-            
             transfer.status = "Done";
             _context.Update(transfer);
             await _context.SaveChangesAsync();
@@ -528,26 +494,11 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             return RedirectToAction(nameof(Index));
         }
 
-        private bool CheckAvailability(int id, out List<FYP.DB.DBTables.Product> insufficientProducts)
-        {
-            var transfer = _context.Transfers
-                .Include(t => t.Transfer_Details)
-                .FirstOrDefault(t => t.ID == id);
 
-            insufficientProducts = new List<FYP.DB.DBTables.Product>();
 
-            foreach (var item in transfer.Transfer_Details)
-            {
-                var product = _context.Products.FirstOrDefault(a => a.product_id == item.product_id);
+        // In your action method
 
-                if (item.demand > product.quantity)
-                {
-                    insufficientProducts.Add(product);
-                }
-            }
 
-            return insufficientProducts.Count == 0; // All products have sufficient quantity
-        }
 
         [HttpGet]
         public IActionResult CreateBackorder()

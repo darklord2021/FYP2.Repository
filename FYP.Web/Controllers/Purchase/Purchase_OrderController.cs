@@ -128,6 +128,11 @@ namespace FYP.Web.Controllers.Purchase
             try
             {
                 // Save the sale order header to the database
+                //viewModel.PurchaseOrder.doc_name = string.Format("P{0:D5}", _context.Purchase_Orders.Count() + 1);
+                string? maxExistingName = _context.Purchase_Orders
+                                       .Select(so => so.doc_name)
+                                       .OrderByDescending(name => name)
+                                       .FirstOrDefault();
                 viewModel.PurchaseOrder.create_date = DateTime.Today.Date;
                 _context.Purchase_Orders.Add(viewModel.PurchaseOrder);
                 _context.SaveChanges();
@@ -232,16 +237,43 @@ namespace FYP.Web.Controllers.Purchase
             //{
             try
             {
+                    var existingPurchaseItems = _context.Purchase_Order_Details
+                                .Where(item => item.purchase_id == viewModel.PurchaseOrder.purchase_id)
+                                .ToList(); 
+                    foreach (var existingPurchaseItem in existingPurchaseItems)
+                    {
+                        _context.Purchase_Order_Details.Remove(existingPurchaseItem);
+                    }
 
-                _context.Update(viewModel.PurchaseOrder);
-                await _context.SaveChangesAsync();
-            foreach (var purchase in viewModel.PurchaseItems) 
-            {
-                        purchase.purchase_id = viewModel.PurchaseOrder.purchase_id;
-                        purchase.ID = purchase.ID;
-                        _context.Update(purchase);
-                        _context.SaveChanges();
-            }
+                    _context.Update(viewModel.PurchaseOrder);
+                    await _context.SaveChangesAsync();
+
+                    //foreach (var purchase in viewModel.PurchaseItems) 
+                    //{
+                    //            purchase.purchase_id = viewModel.PurchaseOrder.purchase_id;
+                    //            purchase.ID = purchase.ID;
+                    //            _context.Update(purchase);
+                    //            _context.SaveChanges();
+                    //}
+
+                    if (viewModel.PurchaseItems is not null)
+                    {
+                        foreach (var item in viewModel.PurchaseItems)
+                        {
+                            var lineItem = new DB.DBTables.Purchase_Order_Detail
+                            {
+                                purchase_id = viewModel.PurchaseOrder.purchase_id,
+                                product_id = item.product_id,
+                                quantity = item.quantity,
+                                price = item.price
+                            };
+                            //if (lineItem.quantity < lineItem.product.quantity)
+                            //{
+                            _context.Purchase_Order_Details.Add(lineItem);
+                            _context.SaveChanges();
+                            //}
+                        }
+                    }
 
                 }
                 catch (DbUpdateConcurrencyException e)

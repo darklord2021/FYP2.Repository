@@ -132,22 +132,8 @@
             //});
 
             $(document).on('click', '.removeLineItem', function () {
-                var itemId = $(this).data('id');
-                var row = $(this).closest('tr');
-
-                // Send AJAX request to remove the line item
-                $.ajax({
-                    url: '@Url.Action("DeleteConfirmed", "Purchase_Order_Detail")/'+itemId,
-                    type: 'POST',
-                    data: { id: itemId },
-                    success: function () {
-                        // Remove the row from the UI
-                        row.remove();
-                    },
-                    error: function (xhr, status, error) {
-                        console.log(error);
-                        // Handle error if needed
-                    }
+                $(document).on('click', '.removeLineItem', function () {
+                    $(this).closest('tr').remove();
                 });
             });
 

@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Finance
 {
+    [Authorize(Roles =("Admin,Finance"))]
     public class Account_MoveController : Controller
     {
         private readonly FYPContext _context;
@@ -61,12 +63,12 @@ namespace FYP.Web.Controllers.Finance
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("ID,Doc_Name,Total_Amount,Date_Created,Taxed_Amount,Source_Doc,Status,operation_type,tax,purchase_source_doc")] Account_Move account_Move)
         {
-            if (ModelState.IsValid)
-            {
+            //if (ModelState.IsValid)
+            //{
                 _context.Add(account_Move);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
-            }
+            //}
             ViewData["Source_Doc"] = new SelectList(_context.Sale_Orders, "name", "name", account_Move.Source_Doc);
             ViewData["purchase_source_doc"] = new SelectList(_context.Purchase_Orders, "doc_name", "doc_name", account_Move.purchase_source_doc);
             return View(account_Move);

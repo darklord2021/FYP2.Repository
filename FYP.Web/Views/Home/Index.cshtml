@@ -131,7 +131,7 @@
     </div>
 </div>
 
-<div class="row">
+@*<div class="row">
     <div class="col-md-7 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
@@ -249,8 +249,15 @@
             </div>
         </div>
     </div>
-</div>
+</div>*@
+@section scripts{
+    <script>
+        var months = @Html.Raw(Json.Serialize(ViewBag.Months));
+        var offlineSales = @Html.Raw(Json.Serialize(ViewBag.OfflineSales));
+        var onlineSales = @Html.Raw(Json.Serialize(ViewBag.OnlineSales));
 
+    </script>
+}
 @*<div class="row">
     <div class="col-md-12 grid-margin stretch-card">
         <div class="card position-relative">

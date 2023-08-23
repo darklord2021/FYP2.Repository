@@ -95,15 +95,15 @@
       var SalesChart = new Chart(SalesChartCanvas, {
         type: 'bar',
         data: {
-          labels: ["Jan", "Feb", "Mar", "Apr", "May"],
+          labels: months,
           datasets: [{
               label: 'Offline Sales',
-              data: [480, 230, 470, 210, 330],
+              data: offlineSales,
               backgroundColor: '#8EB0FF'
             },
             {
               label: 'Online Sales',
-              data: [400, 340, 550, 480, 170],
+              data: onlineSales,
               backgroundColor: '#316FFF'
             }
           ]

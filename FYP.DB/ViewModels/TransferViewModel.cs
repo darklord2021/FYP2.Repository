@@ -10,6 +10,6 @@ namespace FYP.DB.ViewModels
     public class TransferViewModel
     {
         public Transfer Transfer { get; set; }
-        public List<Transfer_Detail> LineItems { get; set;}
+        public List<Transfer_Detail>? LineItems { get; set;}
     }
 }

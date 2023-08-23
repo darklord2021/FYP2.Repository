@@ -63,9 +63,12 @@ public partial class Account_Move
 
     [ForeignKey("Source_Doc")]
     [InverseProperty("Account_Moves")]
+    [Display(Name ="Sales Source Document")]
     public virtual Sale_Order? Source_DocNavigation { get; set; }
 
     [ForeignKey("purchase_source_doc")]
     [InverseProperty("Account_Moves")]
+    [Display(Name = "Purchase Source Document")]
+
     public virtual Purchase_Order? purchase_source_docNavigation { get; set; }
 }

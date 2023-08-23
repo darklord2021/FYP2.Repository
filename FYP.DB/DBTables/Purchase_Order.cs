@@ -11,6 +11,7 @@ namespace FYP.DB.DBTables;
 [Index("doc_name", Name = "IX_Purchase_Order", IsUnique = true)]
 [Index("payment_method", Name = "IX_Purchase_Order_payment_method")]
 [Index("vendor_id", Name = "IX_Purchase_Order_vendor_id")]
+[Display(Name = "Purchase Order")]
 public partial class Purchase_Order
 {
     [Key]
