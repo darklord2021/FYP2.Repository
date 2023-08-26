@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Partners
 {
+    [Authorize(Roles = ("Admin,Sale"))]
     public class CustomersController : Controller
     {
         private readonly FYPContext _context;

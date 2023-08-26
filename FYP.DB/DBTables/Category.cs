@@ -26,10 +26,12 @@ public partial class Category
     [Required(ErrorMessage = "The Created On date is required.")]
     [Column(TypeName = "date")]
     [Display(Name = "Created On")]
+    [DataType(DataType.Date)]
     public DateTime created_on { get; set; }
 
     [Column(TypeName = "date")]
     [Display(Name = "Last Modified")]
+    [DataType(DataType.Date)]
     public DateTime? last_modified { get; set; }
 
     [InverseProperty("category")]

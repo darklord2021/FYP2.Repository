@@ -7,9 +7,11 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Purchase
 {
+    [Authorize(Roles =("Admin,Purchase"))]
     public class Purchase_Order_DetailController : Controller
     {
         private readonly FYPContext _context;

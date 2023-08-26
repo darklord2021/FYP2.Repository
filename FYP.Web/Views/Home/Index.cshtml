@@ -7,6 +7,9 @@
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 </div>
 *@
+@{
+    var mostsold = ViewBag.MostSoldItems;
+}
 
 <div class="row">
     <div class="col-md-12 grid-margin">
@@ -131,23 +134,23 @@
     </div>
 </div>
 
-@*<div class="row">
+<div class="row">
     <div class="col-md-7 grid-margin stretch-card">
         <div class="card">
             <div class="card-body">
-                <p class="card-title mb-0">Top Products</p>
+                <p class="card-title mb-0">Top Sold Products</p>
                 <div class="table-responsive">
                     <table class="table table-hover">
                         <thead>
                             <tr>
-                                <th>User</th>
+                                
                                 <th>Product</th>
-                                <th>Sale</th>
-                                <th>Status</th>
+                                <th>Quantity</th>
+                                <th>Total Value</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
+                            @*<tr>
                                 <td>Jacob</td>
                                 <td>Photoshop</td>
                                 <td class="text-danger"> 28.76% <i class="ti-arrow-down"></i></td>
@@ -182,7 +185,12 @@
                                 <td>Flash</td>
                                 <td class="text-danger"> 21.06% <i class="ti-arrow-down"></i></td>
                                 <td><label class="badge badge-info">Fixed</label></td>
-                            </tr>
+                            </tr>*@
+                            @foreach(var item in mostsold){
+                                <tr>
+                                    <td>@item.GetType()</td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -249,7 +257,7 @@
             </div>
         </div>
     </div>
-</div>*@
+</div>
 @section scripts{
     <script>
         var months = @Html.Raw(Json.Serialize(ViewBag.Months));

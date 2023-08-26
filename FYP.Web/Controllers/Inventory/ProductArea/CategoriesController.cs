@@ -7,9 +7,12 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using FYP.DB.Context;
 using FYP.DB.DBTables;
+using Microsoft.AspNetCore.Authorization;
+using System.Data;
 
 namespace FYP.Web.Controllers.Inventory.ProductArea
 {
+    [Authorize(Roles = ("Admin,Inventory"))]
     public class CategoriesController : Controller
     {
         private readonly FYPContext _context;

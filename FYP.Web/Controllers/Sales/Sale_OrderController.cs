@@ -10,9 +10,11 @@ using FYP.DB.DBTables;
 using FYP.DB.ViewModels;
 using FYP.Services;
 using FYP.Web.Models;
+using Microsoft.AspNetCore.Authorization;
 
 namespace FYP.Web.Controllers.Sales
 {
+    [Authorize(Roles =("Admin,Sale"))]
     public class Sale_OrderController : Controller
     {
         private int count = 0;

@@ -23,6 +23,17 @@ namespace FYP.Web.Controllers
         
         public IActionResult Index()
         {
+            var topsoldproducts=_context.Sale_Order_Details
+                .Include(s=>s.product)
+                .GroupBy(s=>s.product.name)
+                .Select(group=> new
+                {
+                    ProductName= group.Key,
+                    TotalRevenue = group.Sum(s => s.quantity * s.price)
+                })
+                .ToList();
+            ViewBag.MostSoldItems = topsoldproducts;
+            
             var salesData = _context.Sale_Orders
                     .Include(s => s.payment_methodNavigation) // Include the payment_methodNavigation navigation property
                     .ToList(); // Fetch sales data from the database

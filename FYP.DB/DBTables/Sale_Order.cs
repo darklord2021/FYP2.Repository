@@ -75,6 +75,7 @@ namespace FYP.DB.DBTables
         public int sale_id { get; set; }
 
         [Required(ErrorMessage = "The Customer ID field is required.")]
+        [Display(Name ="Customer")]
         public int customer_id { get; set; }
 
         //[Required(ErrorMessage = "The Name field is required.")]
@@ -90,6 +91,7 @@ namespace FYP.DB.DBTables
         public decimal total_amount { get; set; }
 
         [Required(ErrorMessage = "The Payment Method field is required.")]
+        [Display(Name ="Payment Method")]
         public int payment_method { get; set; }
 
         [Column(TypeName = "date")]

@@ -167,14 +167,27 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
             {
                 return Problem("Entity set 'FYPContext.Products'  is null.");
             }
-            var product = await _context.Products.FindAsync(id);
-            if (product != null)
+            var sale=_context.Sale_Order_Details.Include(p=>p.product).Where(s=>s.product_id==id).CountAsync();
+            var purchase = _context.Purchase_Order_Details.Include(p => p.product).Where(s => s.product_id == id).CountAsync();
+            var inventory = _context.Transfer_Details.Include(p => p.product).Where(s => s.product_id == id).CountAsync();
+            if(sale.Result >0 || purchase.Result>0 || inventory.Result > 0) 
             {
-                _context.Products.Remove(product);
+                ViewBag.Error = "Cannot Delete Product as it has Records Associated to it.";
+                return View();
+                //return View("ErrorView");
             }
-            
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            else
+            {
+                var product = await _context.Products.FindAsync(id);
+                if (product != null)
+                {
+                    _context.Products.Remove(product);
+                }
+
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+
         }
 
         private bool ProductExists(int id)
