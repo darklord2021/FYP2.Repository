@@ -142,8 +142,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="SaleItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].quantity" /></td>' +
-                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].quantity" required/></td>' +
+                    '<td><input type="number" class="form-control" name="SaleItems[' + index + '].price" required/></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 

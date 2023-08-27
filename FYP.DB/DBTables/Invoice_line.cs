@@ -22,11 +22,14 @@ public partial class Invoice_line
     [Required(ErrorMessage = "The Price field is required.")]
     [Column(TypeName = "money")]
     [DataType(DataType.Currency)]
-    public decimal price { get; set; }
+	[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+	public decimal price { get; set; }
 
     [Required(ErrorMessage = "The Taxes field is required.")]
     [Range(0, double.MaxValue, ErrorMessage = "Taxes must be a non-negative number.")]
-    public double taxes { get; set; }
+	[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+
+	public double taxes { get; set; }
 
     [Required(ErrorMessage = "The Account ID field is required.")]
     public int account_id { get; set; }

@@ -81,11 +81,11 @@
                         <span asp-validation-for="PurchaseItems[i].product_id" class="text-danger"></span>
                     </td>
                     <td>
-                        <input asp-for="PurchaseItems[i].quantity" class="form-control" />
+                            <input asp-for="PurchaseItems[i].quantity" class="form-control" min="0" />
                         <span asp-validation-for="PurchaseItems[i].quantity" class="text-danger"></span>
                     </td>
                     <td>
-                        <input asp-for="PurchaseItems[i].price" class="form-control" />
+                            <input asp-for="PurchaseItems[i].price" class="form-control" min="0" />
                         <span asp-validation-for="PurchaseItems[i].price" class="text-danger"></span>
                     </td>
                     <td>
@@ -109,8 +109,8 @@
             $('#addLineItem').click(function () {
                 var newRow = '<tr>' +
                     '<td><select class="form-control" name="PurchaseItems[' + index + '].product_id"><option value="">Select a Product</option></select></td>' +
-                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].quantity" /></td>' +
-                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].price" /></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].quantity" required min="0"/></td>' +
+                    '<td><input type="number" class="form-control" name="PurchaseItems[' + index + '].price" required min="0"/></td>' +
                     '<td><button type="button" class="btn btn-danger removeLineItem">Remove</button></td>' +
                     '</tr>';
 

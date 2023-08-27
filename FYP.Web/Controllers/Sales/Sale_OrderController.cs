@@ -314,6 +314,7 @@ namespace FYP.Web.Controllers.Sales
             {
                 return Problem("There's nothing in Sale Orders.");
             }
+            
             var sale_Order = await _context.Sale_Orders.FindAsync(id);
             if (sale_Order != null)
             {

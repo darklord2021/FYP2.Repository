@@ -127,17 +127,31 @@ namespace FYP.Web.Controllers.Purchase
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PurchaseViewModel viewModel)
         {
-            try
-            {
+            //try
+            //{
                 // Save the sale order header to the database
                 //viewModel.PurchaseOrder.doc_name = string.Format("P{0:D5}", _context.Purchase_Orders.Count() + 1);
                 string? maxExistingName = _context.Purchase_Orders
                                        .Select(so => so.doc_name)
-                                       .OrderByDescending(name => name)
+                                       .OrderByDescending(name =>name)
                                        .FirstOrDefault();
+            int count = 0;
+            if (!string.IsNullOrEmpty(maxExistingName) && maxExistingName.Length >= 2)
+                {
+                    if (int.TryParse(maxExistingName.Substring(1), out int numericPart))
+                    {
+                        count = numericPart + 1;
+                    }
+                }
+
+                // Generate the new name
+                string newUniqueName = string.Format("P{0:D5}", count);
+
+                // Set the new unique name
+                viewModel.PurchaseOrder.doc_name = newUniqueName;
                 viewModel.PurchaseOrder.create_date = DateTime.Today.Date;
                 _context.Purchase_Orders.Add(viewModel.PurchaseOrder);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
 
                 // Associate the line items with the sale order
                 if (viewModel.PurchaseItems is not null)
@@ -154,7 +168,7 @@ namespace FYP.Web.Controllers.Purchase
                         //if (lineItem.quantity < lineItem.product.quantity)
                         //{
                         _context.Purchase_Order_Details.Add(lineItem);
-                        _context.SaveChanges();
+                        await _context.SaveChangesAsync();
                         //}
                     }
                 }
@@ -163,15 +177,15 @@ namespace FYP.Web.Controllers.Purchase
                 return RedirectToAction("Index");
                 //}
                 return View(viewModel);
-            }
-            catch (Exception e)
-            {
+            //}
+            //catch (Exception e)
+            //{
 
-                return View("Error", new ErrorViewModel
-                {
-                    ErrorMessage = "An error occurred while processing your request." + e.Message
-                });
-            }
+            //    return View("Error", new ErrorViewModel
+            //    {
+            //        ErrorMessage = "An error occurred while processing your request." + e.Message
+            //    });
+            //}
         }
         // GET: Purchase_Order/Edit/5
         public async Task<IActionResult> Edit(int? id)

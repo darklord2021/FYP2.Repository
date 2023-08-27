@@ -323,13 +323,20 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             {
                 return Problem("Entity set 'FYPContext.Transfers'  is null.");
             }
+            
             var transfer = await _context.Transfers.FindAsync(id);
             if (transfer != null)
             {
-                _context.Transfers.Remove(transfer);
+                if (transfer.status == "Done")
+                {
+                    _context.Transfers.Remove(transfer);
+                await _context.SaveChangesAsync();
+                }
+                else
+                {
+                    ViewBag.Error = "Transfer is already Validated";
+                }
             }
-            
-            await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 

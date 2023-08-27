@@ -26,7 +26,8 @@ public partial class Purchase_Order_Detail
     [Required(ErrorMessage = "The Price field is required.")]
     [Column(TypeName = "money")]
     [DataType(DataType.Currency)]
-    public decimal? price { get; set; }
+	[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+	public decimal? price { get; set; }
 
     [ForeignKey("product_id")]
     [InverseProperty("Purchase_Order_Details")]

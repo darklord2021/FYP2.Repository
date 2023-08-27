@@ -27,6 +27,7 @@ public partial class Transfer
     [Required(ErrorMessage = "The Created Date field is required.")]
     [Column(TypeName = "date")]
     [DataType(DataType.Date)]
+    [Display(Name = "Created on")]
     public DateTime created_date { get; set; }
 
     public int? backorder_doc_id { get; set; }

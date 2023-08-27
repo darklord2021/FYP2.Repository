@@ -28,6 +28,8 @@ var app = builder.Build();
 
 using var scope = app.Services.CreateScope();
 var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+//var host= Host.CreateDefaultBuilder(args)
+    //.ConfigureLogging
 
 // Create roles
 if(!await roleManager.RoleExistsAsync("Admin"))

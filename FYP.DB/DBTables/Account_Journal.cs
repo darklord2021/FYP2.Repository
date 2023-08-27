@@ -23,10 +23,12 @@ public partial class Account_Journal
     [Column(TypeName = "money")]
     [Display(Name = "Debit Amount")]
     [Range(0, double.MaxValue, ErrorMessage = "The debit amount must be a non-negative value.")]
-    public decimal? debit { get; set; }
+	[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+	public decimal? debit { get; set; }
 
     [Column(TypeName = "money")]
     [Display(Name = "Credit Amount")]
     [Range(0, double.MaxValue, ErrorMessage = "The credit amount must be a non-negative value.")]
-    public decimal? credit { get; set; }
+	[DisplayFormat(DataFormatString = "{0:n2}", ApplyFormatInEditMode = true)]
+	public decimal? credit { get; set; }
 }

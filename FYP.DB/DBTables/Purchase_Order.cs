@@ -18,6 +18,7 @@ public partial class Purchase_Order
     public int purchase_id { get; set; }
 
     [Required(ErrorMessage = "The Vendor ID field is required.")]
+    [Display(Name = "Vendor")]
     public int vendor_id { get; set; }
 
     [Required(ErrorMessage = "The Document Name field is required.")]
@@ -45,6 +46,7 @@ public partial class Purchase_Order
     public string state { get; set; } = null!;
 
     [Required(ErrorMessage = "The Payment Method field is required.")]
+    [Display(Name = "Payment Method")]
     public int payment_method { get; set; }
 
     public virtual ICollection<Account_Move> Account_Moves { get; set; } = new List<Account_Move>();
@@ -61,4 +63,7 @@ public partial class Purchase_Order
     [InverseProperty("Purchase_Orders")]
     [Display(Name ="Vendor")]
     public virtual Vendor vendor { get; set; } = null!;
+
+	[NotMapped]
+	public string FormattedOrderNumber => $"P{purchase_id:D5}";
 }
