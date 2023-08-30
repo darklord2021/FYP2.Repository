@@ -9,6 +9,7 @@ using FYP.DB.Context;
 using FYP.DB.DBTables;
 using Microsoft.AspNetCore.Authorization;
 using System.Data;
+using Microsoft.Data.SqlClient;
 
 namespace FYP.Web.Controllers.Partners
 {
@@ -61,13 +62,24 @@ namespace FYP.Web.Controllers.Partners
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("vendor_id,name,NTN,phone_number,email_address,vendor_address,website")] Vendor vendor)
         {
-            if (ModelState.IsValid)
+
+            var duplicate_email_check = _context.Vendors.Where(a => a.email_address == vendor.email_address).Count();
+            if (duplicate_email_check == 0) { 
+                if (ModelState.IsValid)
             {
+                
                 _context.Add(vendor);
                 await _context.SaveChangesAsync();
                 return RedirectToAction(nameof(Index));
             }
             return View(vendor);
+            }
+            else
+            {
+                ViewBag.DuplicateEmail = "Cannot Create with existing email address";
+                return View();
+            }
+
         }
 
         // GET: Vendors/Edit/5
@@ -97,9 +109,11 @@ namespace FYP.Web.Controllers.Partners
             {
                 return NotFound();
             }
-
+            var duplicate_email_check = _context.Vendors.Where(a => a.email_address == vendor.email_address).Count();
             if (ModelState.IsValid)
             {
+
+                if (duplicate_email_check == 0) { 
                 try
                 {
                     _context.Update(vendor);
@@ -115,6 +129,12 @@ namespace FYP.Web.Controllers.Partners
                     {
                         throw;
                     }
+                }
+                }
+                else
+                {
+                    ViewBag.Error = "Cannot Edit Data with existing Email Address";
+                    return View();
                 }
                 return RedirectToAction(nameof(Index));
             }
@@ -148,15 +168,31 @@ namespace FYP.Web.Controllers.Partners
             {
                 return Problem("Entity set 'FYPContext.Vendors'  is null.");
             }
-            var vendor = await _context.Vendors.FindAsync(id);
-            if (vendor != null)
-            {
-                _context.Vendors.Remove(vendor);
-            }
+            var result=_context.Purchase_Orders.Where(s=>s.vendor_id==id).Count();
+            if (result == 0) 
+            { 
+                var vendor = await _context.Vendors.FindAsync(id);
+                if (vendor != null)
+                {
+                    _context.Vendors.Remove(vendor);
+                }
             
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Error = "This Vendor cannot be Deleted";
+                return View();
+            }
         }
+
+        //[AcceptVerbs("Get", "Post")]
+        //public IActionResult IsEmailUnique(string email)
+        //{
+        //    var exists = _context.Vendors.Any(u => u.email_address== email);
+        //    return Json(!exists);
+        //}
 
         private bool VendorExists(int id)
         {

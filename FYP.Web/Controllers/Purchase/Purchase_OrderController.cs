@@ -348,14 +348,24 @@ namespace FYP.Web.Controllers.Purchase
             {
                 return Problem("Entity set 'FYPContext.Purchase_Orders'  is null.");
             }
-            var purchase_Order = await _context.Purchase_Orders.FindAsync(id);
-            if (purchase_Order != null)
+            var data = _context.Purchase_Orders.FirstOrDefault(a => a.purchase_id == id);
+            var result = _context.Transfers.Where(b => b.Source_Document.Contains(data.doc_name) && b.status == "Done").Count();
+            if (result == 0)
             {
-                _context.Purchase_Orders.Remove(purchase_Order);
-            }
+                var purchase_Order = await _context.Purchase_Orders.FindAsync(id);
+                if (purchase_Order != null)
+                {
+                    _context.Purchase_Orders.Remove(purchase_Order);
+                }
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Error = "This Record Cannot be Deleted";
+                return View();
+            }
         }
 
         private bool Purchase_OrderExists(int id)

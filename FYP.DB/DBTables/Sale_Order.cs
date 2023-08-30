@@ -96,7 +96,7 @@ namespace FYP.DB.DBTables
 
         [Column(TypeName = "date")]
         [DataType(DataType.Date)]
-        [Display(Name = "Date Created")]
+        [Display(Name = "Order Date")]
         public DateTime? date_created { get; set; }
 
         [StringLength(50)]

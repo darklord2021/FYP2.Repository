@@ -16,15 +16,15 @@
             <th>
                 @Html.DisplayNameFor(model => model.Doc_Name)
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Total_Amount)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Date_Created)
             </th>
-            <th>
+            @*<th>
                 @Html.DisplayNameFor(model => model.Taxed_Amount)
-            </th>
+            </th>*@
             <th>
                 @Html.DisplayNameFor(model => model.Status)
             </th>
@@ -40,6 +40,7 @@
             <th>
                 @Html.DisplayNameFor(model => model.purchase_source_docNavigation)
             </th>
+            <th>@Html.DisplayNameFor(model=>model.paid)</th>
             <th></th>
         </tr>
     </thead>
@@ -49,15 +50,15 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Doc_Name)
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.Total_Amount)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Date_Created)
             </td>
-            <td>
+            @*<td>
                 @Html.DisplayFor(modelItem => item.Taxed_Amount)
-            </td>
+            </td>*@
             <td>
                 @Html.DisplayFor(modelItem => item.Status)
             </td>
@@ -73,12 +74,28 @@
             <td>
                 @Html.DisplayFor(modelItem => item.purchase_source_docNavigation.doc_name)
             </td>
+            <td>@Html.DisplayFor(modelItem=>item.paid.Value)</td>
             <td>
-                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> |
-                <a asp-action="Details" asp-route-id="@item.ID">Details</a> |
-                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                @if(item.Status !="Posted"){
+                <a asp-action="Edit" asp-route-id="@item.ID">Edit</a> 
+                                    }
+                <a asp-action="Details" asp-route-id="@item.ID">Details</a> 
+                            @if (item.Status != "Posted")
+                            {
+                                <a asp-action="Delete" asp-route-id="@item.ID">Delete</a>
+                            }
+                @if(item.paid != true){
                     <a asp-action="MarkasPaid" asp-route-id="@item.ID">Confirm Payment</a>
-            </td>
+                            }
+                            @{
+                                bool shouldShowText = item.operation_type=="Invoice"; // Replace with your actual condition
+                                string textToShow = shouldShowText ? "Invoice" : "Bill";
+                            }
+                            @if (item.Status != "Posted")
+                            {
+                                <a asp-action="MarkasPosted" asp-route-id="@item.ID">Post @textToShow</a>
+                            }
+                        </td>
         </tr>
 }
     </tbody>

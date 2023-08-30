@@ -147,14 +147,23 @@ namespace FYP.Web.Controllers.Partners
             {
                 return Problem("Entity set 'FYPContext.Customers'  is null.");
             }
-            var customer = await _context.Customers.FindAsync(id);
-            if (customer != null)
-            {
-                _context.Customers.Remove(customer);
-            }
+            var result=_context.Sale_Orders.Where(a=>a.customer_id==id).Count();
+            if(result == 0) 
+            { 
+                var customer = await _context.Customers.FindAsync(id);
+                if (customer != null)
+                {
+                    _context.Customers.Remove(customer);
+                }
             
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Error = "This Customer cannot be Deleted";
+                return View();
+            }
         }
 
         private bool CustomerExists(int id)

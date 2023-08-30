@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Web.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace FYP.DB.DBTables;
@@ -29,11 +30,15 @@ public partial class Vendor
     public long phone_number { get; set; } // Changed to string type
 
     [Required(ErrorMessage = "The Email Address field is required.")]
+    //[RegularExpression(@"/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/", ErrorMessage = "Invalid email address format.")]
     [EmailAddress(ErrorMessage = "Invalid email address format.")]
     [StringLength(100)]
     [Display(Name = "Email Address")]
     [Unicode(false)]
     [DataType(DataType.EmailAddress)]
+    //[Remote("IsEmailUnique", "Validation", ErrorMessage = "Email is already in use.")]
+
+
     public string email_address { get; set; } = null!;
 
     [Required(ErrorMessage = "The Vendor Address field is required.")]

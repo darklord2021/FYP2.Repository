@@ -189,5 +189,22 @@ namespace FYP.Web.Controllers.Finance
 
             }
         }
+
+        public async Task<IActionResult> MarkasPosted(int id)
+        {
+            var inv = await _context.Account_Moves.FirstOrDefaultAsync(tr => tr.ID == id);
+            if (inv is null)
+            {
+                return NotFound();
+            }
+            else
+            {
+                inv.Status = "Posted";
+                _context.Update(inv);
+                await _context.SaveChangesAsync();
+                return RedirectToAction(nameof(Index));
+
+            }
+        }
     }
 }

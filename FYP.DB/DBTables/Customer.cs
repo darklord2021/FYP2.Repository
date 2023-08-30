@@ -19,6 +19,7 @@ public partial class Customer
 
     [Required(ErrorMessage = "The Email field is required.")]
     [StringLength(100)]
+    //[RegularExpression(@"/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/", ErrorMessage = "Invalid email address.")]
     [EmailAddress(ErrorMessage = "Invalid email address.")]
     [Display(Name = "Email Address")]
     [Unicode(false)]

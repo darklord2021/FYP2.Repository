@@ -468,13 +468,13 @@ namespace FYP.Web.Controllers.Inventory.Transfers
             }
 
             // Check availability before confirming the transfer
-            List<int> insufficientProductIds;
-            if (!CheckAvailability(id, out insufficientProductIds))
-            {
-                TempData["InsufficientProductIds"] = insufficientProductIds;
-                TempData["TransferId"] = id;
-                return RedirectToAction(nameof(CreateBackorder));
-            }
+            //List<int> insufficientProductIds;
+            //if (!CheckAvailability(id, out insufficientProductIds))
+            //{
+            //    TempData["InsufficientProductIds"] = insufficientProductIds;
+            //    TempData["TransferId"] = id;
+            //    return RedirectToAction(nameof(CreateBackorder));
+            //}
 
             // Update the stock based on the operation type (sale or purchase)
             foreach (var item in transfer.Transfer_Details)
@@ -482,13 +482,14 @@ namespace FYP.Web.Controllers.Inventory.Transfers
                 var product = _context.Products.FirstOrDefault(p => p.product_id == item.product_id);
                 if (product != null)
                 {
+                    
                     if (transfer.operation_type == "DN" && item.demand <= product.quantity)
                     {
                         product.quantity -= item.demand; // Reduce stock for sale
                     }
                     else if (transfer.operation_type == "GRN")
                     {
-                        product.quantity += item.demand; // Increase stock for purchase
+                        product.quantity += item.done; // Increase stock for purchase
                     }
                 }
             }

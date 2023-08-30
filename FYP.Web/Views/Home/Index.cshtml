@@ -92,6 +92,7 @@
     <div class="col-md-6 grid-margin stretch-card">
         <div class="card border-bottom-0">
             <div class="card-body pb-0">
+                <p class="card-title mb-0">Most Purchased products</p>
                     <table class="table table-hover">
                         <thead>
                             <tr>
@@ -102,14 +103,21 @@
                             </tr>
                         </thead>
                         <tbody>
+                        @if(mostpurchased is not null)
+                        {
                             @foreach (var item in mostpurchased)
                             {
                                 <tr>
                                     <td>@item.ProductName</td>
                                     <td>@item.Quantity</td>
-                                <td>@item.TotalCost.Value.ToString("N2")</td>
+                                    <td>@item.TotalCost.Value.ToString("N2")</td>
                                 </tr>
                             }
+                        }
+                        else
+                        {
+                        <tr><td colspan="4">Theres Nothing</td></tr>
+                        }
                         </tbody>
                     </table>
         </div>
@@ -133,14 +141,22 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach(var item in topcust){
-                                <tr>
-                                    <td>@item.Customers</td>
-                                    <td>@item.quantity_purchased</td>
-                                        <td>@item.amount_spent.ToString("N2")</td>
-                                        <td>@Convert.ToDecimal(item.amount_spent / item.quantity_purchased).ToString("N2")</td>
-                                </tr>
+                            @if(topcust is not null)
+                            {
+                                @foreach(var item in topcust){
+                                    <tr>
+                                        <td>@item.Customers</td>
+                                        <td>@item.quantity_purchased</td>
+                                            <td>@item.amount_spent.ToString("N2")</td>
+                                            <td>@Convert.ToDecimal(item.amount_spent / item.quantity_purchased).ToString("N2")</td>
+                                    </tr>
+                                    }
                             }
+                                else
+                                {
+                                 <tr><td colspan="4">Theres Nothing</td></tr>   
+                                }
+
                         </tbody>
                     </table>
                 </div>
@@ -163,13 +179,20 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @foreach (var item in mostsold)
+                            @if(mostsold is not null)
                             {
-                                <tr>
-                                    <td>@item.ProductName</td>
-                                    <td>@item.Quantity</td>
-                                        <td>@item.TotalRevenue.ToString("N2")</td>
-                                </tr>
+                                @foreach (var item in mostsold)
+                                {
+                                    <tr>
+                                        <td>@item.ProductName</td>
+                                        <td>@item.Quantity</td>
+                                            <td>@item.TotalRevenue.ToString("N2")</td>
+                                    </tr>
+                                }
+                            }
+                            else
+                            {
+                            <tr><td colspan="3">Theres Nothing</td></tr>
                             }
                         </tbody>
                     </table>

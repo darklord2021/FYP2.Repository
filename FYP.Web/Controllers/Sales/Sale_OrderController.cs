@@ -11,6 +11,7 @@ using FYP.DB.ViewModels;
 using FYP.Services;
 using FYP.Web.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace FYP.Web.Controllers.Sales
 {
@@ -237,13 +238,7 @@ namespace FYP.Web.Controllers.Sales
                 _context.Update(viewModel.SaleOrder);
                 await _context.SaveChangesAsync();
 
-                //foreach (var purchase in viewModel.PurchaseItems) 
-                //{
-                //            purchase.purchase_id = viewModel.PurchaseOrder.purchase_id;
-                //            purchase.ID = purchase.ID;
-                //            _context.Update(purchase);
-                //            _context.SaveChanges();
-                //}
+                
 
                 if (viewModel.SaleItems is not null)
                 {
@@ -256,11 +251,10 @@ namespace FYP.Web.Controllers.Sales
                             quantity = item.quantity,
                             price = item.price
                         };
-                        //if (lineItem.quantity < lineItem.product.quantity)
-                        //{
+                
                         _context.Sale_Order_Details.Add(lineItem);
                         _context.SaveChanges();
-                        //}
+                        
                     }
                 }
 
@@ -314,7 +308,9 @@ namespace FYP.Web.Controllers.Sales
             {
                 return Problem("There's nothing in Sale Orders.");
             }
-            
+            var data=_context.Sale_Orders.FirstOrDefault(a=>a.sale_id==id);
+            var result = _context.Transfers.Where(b => b.Source_Document.Contains(data.name) && b.status=="Done").Count();
+            if (result == 0) { 
             var sale_Order = await _context.Sale_Orders.FindAsync(id);
             if (sale_Order != null)
             {
@@ -323,6 +319,12 @@ namespace FYP.Web.Controllers.Sales
 
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Error = "This Record Cannot be Deleted";
+                return View();
+            }
         }
 
         private bool Sale_OrderExists(int id)
@@ -340,7 +342,9 @@ namespace FYP.Web.Controllers.Sales
             var saleOrder = await _context.Sale_Orders
                 .Include(so => so.Sale_Order_Details)
                 .FirstOrDefaultAsync(so => so.sale_id == id);
-
+            var customerdata=_context.Customers.FirstOrDefault(a=>a.customer_id == saleOrder.customer_id);
+            var eligibility = customerdata.record;
+            
             if (saleOrder == null)
             {
                 return NotFound();
@@ -468,6 +472,7 @@ namespace FYP.Web.Controllers.Sales
             var sale_Order = await  _context.Sale_Orders
                 .Include(so=>so.customer)
                 .FirstOrDefaultAsync(so=>so.sale_id==id);
+            var sod=_context.Sale_Order_Details.Where(s=>s.sale_id==id).ToList();
             string data = 
                 "<h1>"+sale_Order.name+"<h1/>"
                 +"<div class='row'>" +
@@ -479,6 +484,10 @@ namespace FYP.Web.Controllers.Sales
                     "<div class='row'><span>Customer: </span><span>"+sale_Order.customer.customer_name+ "</span></div>"
                     +
                     "</div>"+
+                    "<div class='row'>"+
+                    "<table class='table'>" + "<tr><th>Product Name</th><th>Quantity</th><th>Price</th><th>Subtotal</th></tr>" +
+                    "</table>"+
+                    "</div>"+
                 "</div>";
             var pdfBytes = _pdfGenerator.GetHTMLPageAsPDF(data);
 
@@ -488,5 +497,14 @@ namespace FYP.Web.Controllers.Sales
 
             return File(pdfBytes, "application/pdf");
         }
+        //public string lineitems(Sale_Order_Detail sod)
+        //{
+        //    string reault=""
+        //    foreach(var lines in sod)
+        //    {
+        //        reault
+        //    }
+
+        //}
     }
 }

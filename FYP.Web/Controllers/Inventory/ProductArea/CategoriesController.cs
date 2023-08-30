@@ -150,6 +150,9 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
             {
                 return Problem("Entity set 'FYPContext.Categories'  is null.");
             }
+            var result=_context.Products.Where(s=>s.category_id==id).Count();
+            if (result == 0) 
+            { 
             var category = await _context.Categories.FindAsync(id);
             if (category != null)
             {
@@ -158,6 +161,12 @@ namespace FYP.Web.Controllers.Inventory.ProductArea
             
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
+            }
+            else
+            {
+                ViewBag.Error = "This Category cannot be Deleted as it has Products Associated to it";
+                return View();
+            }
         }
 
         private bool CategoryExists(int id)

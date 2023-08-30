@@ -129,6 +129,7 @@
             @Html.DropDownList("SaleOrder.payment_method", (SelectList)ViewData["payment_method"], "Select a payment method", new { @class = "form-control" })
             <span asp-validation-for="SaleOrder.payment_method" class="text-danger"></span>
         </div>
+        <input asp-for="SaleOrder.total_amount" type="hidden" id="totalAmountInput" readonly="1"/>
     </div>
 
     <div>
@@ -209,6 +210,34 @@
 
             $(document).on('click', '.removeLineItem', function () {
                 $(this).closest('tr').remove();
+            });
+        });
+
+
+        function updateTotalAmount() {
+            var totalAmount = 0;
+
+            $('#lineItemsBody tr').each(function () {
+                var quantity = parseFloat($(this).find('[name$=".quantity"]').val());
+                var price = parseFloat($(this).find('[name$=".price"]').val());
+
+                if (!isNaN(quantity) && !isNaN(price)) {
+                    totalAmount += quantity * price;
+                }
+            });
+
+            $('#totalAmountInput').val(totalAmount.toFixed(2));
+        }
+
+        $(document).ready(function () {
+            updateTotalAmount();
+
+            $('#lineItemsBody').on('input', 'input', function () {
+                updateTotalAmount();
+            });
+
+            $('#lineItemsBody').on('change', 'select', function () {
+                updateTotalAmount();
             });
         });
     </script>
